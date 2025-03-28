@@ -23,6 +23,11 @@ def index():
 def submit():
     return render_template('submit.html')
 
+
+@app.route('/exploreProjects')
+def explore():
+    return render_template('explore.html')
+
 @app.route('/grabProject', methods=['GET'])  #NOT SETUP YET
 def getTutorial():
     return jsonify()
