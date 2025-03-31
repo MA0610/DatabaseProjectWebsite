@@ -14,8 +14,47 @@
 <body>
     <h1>Project Submission</h1>
 
-    <button type="button" id="submitButton">Submit Tutorial</button>
-    
+
+
+    <div class="addProject">
+        <h2>New Project</h2>
+        <!-- NEED TO ADD CSS STYLING TO INCREASE SIZE OF BOXES -->
+        <div class="add-Project-Username">
+            <label for="new-Project-Username">Project Author:</label>
+            <input type="text" id="new-Project-Username" placeholder="Enter Username...">
+        </div>
+
+        <div class="add-Project-Categories">
+            <label for="new-Project-Categories">Project Categories:</label>
+            <input type="text" id="new-Project-Categories" placeholder="Enter Categories...">
+        </div>
+
+        <div class="add-Project-Description">
+            <label for="new-Project-Description">Project Description:</label>
+            <input type="text" id="new-Project-Description" placeholder="Enter Project Description...">
+        </div>
+
+        <div class="add-Project-Link">
+            <label for="new-Project-Link">Project Link:</label>
+            <input type="text" id="new-Project-Link" placeholder="Enter Project Github Link...">
+        </div>
+
+     
+       
+
+   
+
+        <!-- Submit Button -->
+        <button type="button" id="submitButton">Submit Tutorial</button>  
+
+        <!-- <button type="button" id="clearDatabaseButton">Clear Schedule</button> -->
+        <br></br>
+
+        <!-- <h3>Directions</h3> -->
+        
+
+    </div>  
+
     
 
 
@@ -27,7 +66,52 @@
 
     <script>
 
-   
+document.getElementById('submitButton').addEventListener('click', () => {
+
+const userName = document.getElementById('new-Project-Username').value;
+const description = document.getElementById('new-Project-Description').value;
+const categories = document.getElementById('new-Project-Categories').value;
+const link = document.getElementById('new-Project-Link').value;
+
+
+
+const requestData = {
+            projectAuthor: userName, 
+            projectDescription: description,
+            projectCategories: categories,
+            projectLink: link
+};
+
+// Clear the form inputs
+document.getElementById('new-Project-Username').value = '';
+document.getElementById('new-Project-Description').value = '';
+document.getElementById('new-Project-Categories').value = '';
+document.getElementById('new-Project-Link').value = '';
+
+
+try {        
+            const response = fetch('/putProject', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(requestData)
+            });
+
+
+            if (data.success) {
+                console.log('Project submitted successfully!');
+            } else {
+                console.error('Project submitting tutorial');
+            }
+        } catch (error) {
+            console.error('Error during fetch:', error);
+        }
+
+        alert('Project submitted for approval!');
+
+});
+
    
                
 
