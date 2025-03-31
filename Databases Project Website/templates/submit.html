@@ -1,121 +1,76 @@
-{% extends "base.html" %}
-{% block title %}Submit Project{% endblock %}
+from flask import Flask, request, jsonify, render_template, Blueprint  
+from models import db, Project
 
-{% block content %}
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Project Submission</title>
-    <style>
-      
-    </style>
-</head>
+app = Flask(__name__)
 
-<body>
-    <h1>Project Submission</h1>
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///projects.db'  
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db.init_app(app)
+
+with app.app_context():
+    db.create_all()  # Creates the database tables
 
 
 
-    <div class="addProject">
-        <h2>New Project</h2>
-        <!-- NEED TO ADD CSS STYLING TO INCREASE SIZE OF BOXES -->
-        <div class="add-Project-Username">
-            <label for="new-Project-Username">Project Author:</label>
-            <input type="text" id="new-Project-Username" placeholder="Enter Username...">
-        </div>
-
-        <div class="add-Project-Categories">
-            <label for="new-Project-Categories">Project Categories:</label>
-            <input type="text" id="new-Project-Categories" placeholder="Enter Categories...">
-        </div>
-
-        <div class="add-Project-Description">
-            <label for="new-Project-Description">Project Description:</label>
-            <input type="text" id="new-Project-Description" placeholder="Enter Project Description...">
-        </div>
-
-        <div class="add-Project-Link">
-            <label for="new-Project-Link">Project Link:</label>
-            <input type="text" id="new-Project-Link" placeholder="Enter Project Github Link...">
-        </div>
-
-     
-       
-
-   
-
-        <!-- Submit Button -->
-        <button type="button" id="submitButton">Submit Tutorial</button>  
-
-        <!-- <button type="button" id="clearDatabaseButton">Clear Schedule</button> -->
-        <br></br>
-
-        <!-- <h3>Directions</h3> -->
-        
-
-    </div>  
-
-    
+# Sets home.html to / (root/start page)
+@app.route('/')
+def index():
+    return render_template('home.html')
 
 
-    
-    <div class="main-container">
-     
-    </div>
+@app.route('/submitProject')
+def submit():
+    return render_template('submit.html')
+
+@app.route('/grabProject', methods=['GET'])  #NOT SETUP YET
+def getProject():
+    return jsonify()
+
+@app.route('/putProject',methods=['POST'])
+def putProject():
+    data = request.json
+
+    projectUser = data.get('projectAuthor')
+    projectCategories = data.get('projectCategories')
+    projectDescription = data.get('projectDescription')
+    projectLink = data.get('projectLink')
+  
+    newProject = Project(
+        userName = projectUser,
+        categories = projectCategories,
+        description = projectDescription,
+        githubLink = projectLink
+    )
+
+    db.session.add(newProject)
+    db.session.commit()
+
+    return jsonify(success=True, message="Project added successfully")
 
 
-    <script>
+@app.route('/test', methods=['GET'])
+def test():
+    allProjects = []
 
-document.getElementById('submitButton').addEventListener('click', () => {
+    projectValues = Project.query.all()
 
-const userName = document.getElementById('new-Project-Username').value;
-const description = document.getElementById('new-Project-Description').value;
-const categories = document.getElementById('new-Project-Categories').value;
-const link = document.getElementById('new-Project-Link').value;
-
-
-
-const requestData = {
-            projectAuthor: userName, 
-            projectDescription: description,
-            projectCategories: categories,
-            projectLink: link
-};
-
-// Clear the form inputs
-document.getElementById('new-Project-Username').value = '';
-document.getElementById('new-Project-Description').value = '';
-document.getElementById('new-Project-Categories').value = '';
-document.getElementById('new-Project-Link').value = '';
-
-
-try {        
-            const response = fetch('/putProject', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(requestData)
-            });
-
-
-            if (data.success) {
-                console.log('Project submitted successfully!');
-            } else {
-                console.error('Project submitting tutorial');
-            }
-        } catch (error) {
-            console.error('Error during fetch:', error);
+    for projects in projectValues:
+        project_data = {
+            "id": projects.id,
+            "username": projects.userName,
+            "description": projects.description,
+            "categories": projects.categories,
+            "githubLink": projects.githubLink
         }
+    
+        allProjects.append(project_data)
+        print(project_data)
+    
+    
 
-        alert('Project submitted for approval!');
-
-});
-
-   
-               
+    return jsonify(allProjects)
 
 
-    </script>
-</body>
-{% endblock %}
+if __name__ == '__main__':
+    app.run(debug=True)
