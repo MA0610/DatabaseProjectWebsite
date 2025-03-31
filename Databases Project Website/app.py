@@ -33,8 +33,49 @@ def getTutorial():
     return jsonify()
 
 @app.route('/putProject',methods=['POST'])
-def putTutorial():
-    return jsonify(success=True, message="Tutorial added successfully")
+def putProject():
+    data = request.json
+
+    projectUser = data.get('projectAuthor')
+    projectCategories = data.get('projectCategories')
+    projectDescription = data.get('projectDescription')
+    projectLink = data.get('projectLink')
+  
+    newProject = Project(
+        userName = projectUser,
+        categories = projectCategories,
+        description = projectDescription,
+        githubLink = projectLink
+    )
+
+    db.session.add(newProject)
+    db.session.commit()
+
+    return jsonify(success=True, message="Project added successfully")
+
+
+@app.route('/test', methods=['GET'])
+def test():
+    allProjects = []
+
+    projectValues = Project.query.all()
+
+    for projects in projectValues:
+        project_data = {
+            "id": projects.id,
+            "username": projects.userName,
+            "description": projects.description,
+            "categories": projects.categories,
+            "githubLink": projects.githubLink
+        }
+    
+        allProjects.append(project_data)
+        print(project_data)
+    
+    
+
+    return jsonify(allProjects)
+
 
 
 if __name__ == '__main__':
