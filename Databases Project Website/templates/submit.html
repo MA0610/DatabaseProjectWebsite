@@ -102,11 +102,20 @@
 
 document.getElementById('submitButton').addEventListener('click', () => {
 
+
+
+
+
+
 const userName = document.getElementById('new-Project-Username').value;
 const description = document.getElementById('new-Project-Description').value;
 const categories = document.getElementById('new-Project-Categories').value;
 const link = document.getElementById('new-Project-Link').value;
 
+ if (!userName || !description || !categories || !link) {
+        alert("Please fill in all fields before submitting.");
+        return; 
+    }
 
 
 const requestData = {
