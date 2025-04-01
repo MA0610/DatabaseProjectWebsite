@@ -28,6 +28,11 @@ def submit():
 def explore():
     return render_template('explore.html')
 
+#sample lsit page with all projects of a certain category listed
+@app.route('/exploreX')
+def exploreX():
+    return render_template('list.html')
+
 @app.route('/grabProject', methods=['GET'])  #NOT SETUP YET
 def getTutorial():
     return jsonify()
