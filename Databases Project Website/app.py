@@ -1,6 +1,5 @@
 from flask import Flask, request, jsonify, render_template, Blueprint  
 from models import db, Project
-
 app = Flask(__name__)
 
 
@@ -12,6 +11,23 @@ with app.app_context():
     db.create_all()  # Creates the database tables
 
 
+def get_data_from_db():
+    # Use SQLAlchemy to query the Project table
+    projects = Project.query.all()  # Get all projects from the 'project' table
+
+    # Format the results as a list of dictionaries to pass to the template
+    data = []
+    for project in projects:
+        project_data = {
+            "id": project.id,
+            "userName": project.userName,
+            "categories": project.categories,
+            "description": project.description,
+            "githubLink": project.githubLink
+        }
+        data.append(project_data)
+
+    return data
 
 # Sets home.html to / (root/start page)
 @app.route('/')
@@ -28,14 +44,14 @@ def submit():
 def explore():
     return render_template('explore.html')
 
-#sample lsit page with all projects of a certain category listed
-@app.route('/exploreX')
-def exploreX():
-    return render_template('list.html')
-
-@app.route('/grabProject', methods=['GET'])  #NOT SETUP YET
-def getTutorial():
-    return jsonify()
+# @app.route('/grabProject', methods=['GET'])  #NOT SETUP YET
+# def getTutorial():
+#     return jsonify()
+@app.route('/list')
+def projects():
+    data = get_data_from_db()  # Call the function to get data
+    print (data)
+    return render_template('list.html', data=data) 
 
 @app.route('/putProject',methods=['POST'])
 def putProject():
