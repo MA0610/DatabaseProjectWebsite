@@ -40,7 +40,7 @@ def exploreX():
         # If nothing selected, you can return all projects or show a message
         filtered_projects = Project.query.all()
     else:
-        filtered_projects = Project.query.filter(Project.category.in_(selected_categories)).all()
+        filtered_projects = Project.query.filter(Project.categories.in_(selected_categories)).all()
 
     return render_template('list.html', projects=filtered_projects,
                            selected_categories=selected_categories)
