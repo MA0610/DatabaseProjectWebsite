@@ -15,13 +15,26 @@
     <h1>Explore</h1>
 
 
-    <button type="button" id="AllButton" onclick="window.location.href = '/exploreX' ; " class="button">All</button>
+    <!--<button type="button" id="AllButton" onclick="window.location.href = '/exploreX' ; " class="button">All</button>
     <button type="button" id="MLButton">ML</button>
     <button type="button" id="AIButton">AI</button>
     <button type="button" id="WDButton">Web Dev</button>
     <button type="button" id="GDButton">Game Dev</button>
     <button type="button" id="NLPButton">NLP</button>
-    <button type="button" id="DSButton">Data Science</button>
+    <button type="button" id="DSButton">Data Science</button>-->
+
+    <form method="POST" action="/exploreX">
+        <h3>Select Categories:</h3>
+
+        <label><input type="checkbox" name="category" value="ML"> ML</label><br>
+        <label><input type="checkbox" name="category" value="NLP"> NLP</label><br>
+        <label><input type="checkbox" name="category" value="Game Development"> Game Development</label><br>
+        <label><input type="checkbox" name="category" value="Web Development"> Web Development</label><br>
+        <label><input type="checkbox" name="category" value="AI"> AI</label><br>
+        <label><input type="checkbox" name="category" value="Data Science"> Data Science</label><br>
+
+        <button type="submit">Explore Projects</button>
+    </form>
     
     
 

@@ -12,10 +12,22 @@
 </head>
 
 <body>
-    <h1>*Sample* Projects</h1>
+    <h1>Filtered Projects</h1>
 
+    {% if selected_categories %}
+    <p>Showing projects in categories: {{ ", ".join(selected_categories) }}</p>
+    {% else %}
+    <p>Showing all projects.</p>
+    {% endif %}
 
-    <p1> Author, Project Title, Categories </p1>
+    <ul>
+    {% for project in projects %}
+        <li>{{ project.title }} — {{ project.category }}</li>
+    {% endfor %}
+    </ul>
+
+<a href="/exploreProjects">Back to Explore</a>
+
     
     
 
