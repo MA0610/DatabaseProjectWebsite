@@ -50,7 +50,7 @@ def explore():
 #    return render_template('list.html')
 @app.route('/exploreX', methods=['POST'])
 def exploreX():
-    selected_categories = request.form.getlist('category')  # getlist gets all values of 'categories'
+    selected_categories = request.form.getlist('categories')  # getlist gets all values of 'categories'
 
     if not selected_categories:
         # If nothing selected, you can return all projects or show a message
