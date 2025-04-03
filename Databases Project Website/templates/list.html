@@ -1,50 +1,37 @@
 {% extends "base.html" %}
 {% block title %}Projects List{% endblock %}
 
-{% block content %}
-<head>
+{% block head %}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>*Sample* Projects</title>
+    <title>List of Projects</title>
     <style>
-      
+        /* Add styles here if needed */
     </style>
-</head>
+{% endblock %}
 
-<body>
-    <h1>Filtered Projects</h1>
-
-    {% if selected_categories %}
-    <p>Showing projects in categories: {{ ", ".join(selected_categories) }}</p>
-    {% else %}
-    <p>Showing all projects.</p>
-    {% endif %}
-
-    <ul>
-    {% for project in projects %}
-        <li>{{ project.title }} — {{ project.category }}</li>
-    {% endfor %}
-    </ul>
-
-<a href="/exploreProjects">Back to Explore</a>
-
-    
-    
-
-
-    
-    <div class="main-container">
-     
-    </div>
-
-
-    <script>
-
-   
-   
-               
-
-
-    </script>
-</body>
+{% block content %}
+<h1>Project List</h1>
+<table border="1">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>User Name</th>
+            <th>Categories</th>
+            <th>Description</th>
+            <th>GitHub Link</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for project in data %}
+            <tr>
+                <td>{{ project.id }}</td>
+                <td>{{ project.userName }}</td>
+                <td>{{ project.categories }}</td>
+                <td>{{ project.description }}</td>
+                <td><a href="{{ project.githubLink }}" target="_blank">GitHub</a></td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
 {% endblock %}
