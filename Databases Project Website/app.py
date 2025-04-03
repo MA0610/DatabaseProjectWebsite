@@ -44,10 +44,22 @@ def submit():
 def explore():
     return render_template('explore.html')
 
-#sample lsit page with all projects of a certain category listed
-@app.route('/exploreX')
+#sample lsit page with all projects of selected categories listed
+#@app.route('/exploreX')
+#def exploreX():
+#    return render_template('list.html')
+@app.route('/exploreX', methods=['POST'])
 def exploreX():
-    return render_template('list.html')
+    selected_categories = request.form.getlist('categories')  # getlist gets all values of 'categories'
+
+    if not selected_categories:
+        # If nothing selected, you can return all projects or show a message
+        filtered_projects = Project.query.all()
+    else:
+        filtered_projects = Project.query.filter(Project.categories.in_(selected_categories)).all()
+
+    return render_template('list.html', projects=filtered_projects,
+                           selected_categories=selected_categories)
 
 @app.route('/grabProject', methods=['GET'])  #NOT SETUP YET
 def getTutorial():

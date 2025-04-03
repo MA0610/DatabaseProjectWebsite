@@ -12,6 +12,11 @@
 
 {% block content %}
 <h1>Project List</h1>
+{% if selected_categories %}
+    <p>Showing projects in categories: {{ ", ".join(selected_categories) }}</p>
+{% else %}
+    <p>Showing all projects.</p>
+{% endif %}
 <table border="1">
     <thead>
         <tr>
@@ -34,4 +39,5 @@
         {% endfor %}
     </tbody>
 </table>
+<a href="/exploreProjects">Back to Explore</a>
 {% endblock %}
