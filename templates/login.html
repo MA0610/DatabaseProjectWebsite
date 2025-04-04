@@ -1,0 +1,27 @@
+<!-- login.html -->
+{% extends "base.html" %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+  <!-- Display the message as an alert (only if it's set) -->
+  {% if message %}
+    <div class="alert alert-{{ 'success' if message_type == 'success' else 'danger' }}">
+      {{ message }}
+    </div>
+  {% endif %}
+
+  <form method="POST">
+    <h3 align="center">Login</h3>
+    <div class="form-group">
+      <label for="email">Email Address</label>
+      <input type="email" class="form-control" id="email" name="email" placeholder="Enter email" required />
+    </div>
+    <div class="form-group">
+      <label for="password">Password</label>
+      <input type="password" class="form-control" id="password" name="password" placeholder="Enter password" required />
+    </div>
+    <br />
+    <button type="submit" class="btn btn-primary">Login</button>
+  </form>
+{% endblock %}
