@@ -50,16 +50,17 @@ def explore():
 #    return render_template('list.html')
 @app.route('/exploreX', methods=['POST'])
 def exploreX():
-    selected_categories = request.form.getlist('categories')  # getlist gets all values of 'categories'
+    selected_categories = request.form.getlist('categories')
 
-    if not selected_categories:
-        # If nothing selected, you can return all projects or show a message
-        filtered_projects = Project.query.all()
-    else:
+    if selected_categories:
         filtered_projects = Project.query.filter(Project.categories.in_(selected_categories)).all()
+    else:
+        filtered_projects = Project.query.all()
 
-    return render_template('list.html', projects=filtered_projects,
+    return render_template('list.html',
+                           data=filtered_projects,
                            selected_categories=selected_categories)
+
 
 @app.route('/grabProject', methods=['GET'])  #NOT SETUP YET
 def getTutorial():
@@ -69,7 +70,7 @@ def getTutorial():
 def projects():
     data = get_data_from_db()  # Call the function to get data
     print (data)
-    return render_template('list.html', data=data) 
+    return render_template('list.html', data=data)
 
 @app.route('/putProject',methods=['POST'])
 def putProject():
