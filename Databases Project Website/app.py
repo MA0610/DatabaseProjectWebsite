@@ -1,5 +1,7 @@
 from flask import Flask, request, jsonify, render_template, Blueprint  
 from models import db, Project
+from sqlalchemy import or_
+
 
 app = Flask(__name__)
 
@@ -53,7 +55,9 @@ def exploreX():
     selected_categories = request.form.getlist('categories')
 
     if selected_categories:
-        filtered_projects = Project.query.filter(Project.categories.in_(selected_categories)).all()
+        #filtered_projects = Project.query.filter(Project.categories.in_(selected_categories)).all()
+        filters = [Project.categories.ilike(f"%{cat}%") for cat in selected_categories]
+        filtered_projects = Project.query.filter(or_(*filters)).all()
     else:
         filtered_projects = Project.query.all()
 
