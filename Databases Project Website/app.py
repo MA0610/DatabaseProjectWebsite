@@ -24,6 +24,7 @@ def get_data_from_db():
             "id": project.id,
             "userName": project.userName,
             "categories": project.categories,
+            "course": project.course,
             "description": project.description,
             "githubLink": project.githubLink
         }
@@ -82,12 +83,14 @@ def putProject():
 
     projectUser = data.get('projectAuthor')
     projectCategories = data.get('projectCategories')
+    projectCourse = data.get('projectCourse')
     projectDescription = data.get('projectDescription')
     projectLink = data.get('projectLink')
   
     newProject = Project(
         userName = projectUser,
         categories = projectCategories,
+        course = projectCourse,
         description = projectDescription,
         githubLink = projectLink
     )
@@ -110,6 +113,7 @@ def test():
             "username": projects.userName,
             "description": projects.description,
             "categories": projects.categories,
+            "course": projects.course,
             "githubLink": projects.githubLink
         }
     
