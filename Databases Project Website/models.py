@@ -10,3 +10,7 @@ class Project(db.Model):
     description = db.Column(db.String(10000), nullable=False)
     githubLink = db.Column(db.String(100),nullable=False)
 
+class Courses(db.Model):
+    id = db.Column(db.Integer, primary_key = True, autoincrement = True)
+    course = db.Column(db.String(100), nullable = False)
+
