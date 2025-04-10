@@ -75,7 +75,7 @@
 
         <div class="add-Project-Course">
             <label for="new-Project-Course">Project Course:</label>
-            <div class="categoryCheckboxes">
+            <div class="courseCheckboxes">
                 <label><input type="checkbox" name="Personal Project" value="Personal Project" id="PersonalProject"> Personal Project</label>
                 <label><input type="checkbox" name="COMP 490" value="COMP 490" id="COMP 490"> COMP 490</label>
                 <label><input type="checkbox" name="COMP 390" value="COMP 390" id="COMP 390"> COMP 390</label>
@@ -133,14 +133,24 @@
             categoryCheckboxes.forEach(checkbox => {
                 selectedCategories.push(checkbox.value);  // Push the value of the selected checkbox
             });
-    
+
+            //Collect selected course
+            let selectedCourse = [];
+            const courseCheckboxes = document.querySelectorAll('.courseCheckboxes input[type="checkbox"]:checked');
+            courseCheckboxes.forEach(checkbox => {
+                selectedCourse.push(checkbox.value);  // Push the value of the selected checkbox
+            });
+
             // Join the selected categories into a single string
             const categories = selectedCategories.length > 0 ? selectedCategories.join(', ') : ''; // Handle no selection
-    
+
+            // Join the selected courses into a single string
+            const course = selectedCourse.length > 0 ? selectedCourse.join(', ') : ''; // Handle no selection
+
             const link = document.getElementById('new-Project-Link').value;
     
             // Check if all fields are filled, including categories
-            if (!userName || !description || !categories || !link) {
+            if (!userName || !description || !categories || !course ||!link) {
                 alert("Please fill in all fields before submitting.");
                 return; 
             }
@@ -149,6 +159,7 @@
                 projectAuthor: userName, 
                 projectDescription: description,
                 projectCategories: categories,
+                projectCourse: course,
                 projectLink: link
             };
     
@@ -157,7 +168,11 @@
             document.getElementById('new-Project-Description').value = '';
             document.getElementById('new-Project-Link').value = '';
              // Uncheck all checkboxes
-            const checkboxes = document.querySelectorAll('.categoryCheckboxes input[type="checkbox"]');
+            const catCheckboxes = document.querySelectorAll('.categoryCheckboxes input[type="checkbox"]');
+            catCheckboxes.forEach(checkbox => {
+                checkbox.checked = false;  // Uncheck each checkbox
+            });
+            const checkboxes = document.querySelectorAll('.courseCheckboxes input[type="checkbox"]');
             checkboxes.forEach(checkbox => {
                 checkbox.checked = false;  // Uncheck each checkbox
             });
