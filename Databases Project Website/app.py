@@ -2,6 +2,8 @@ from flask import Flask, request, jsonify, render_template, flash, redirect, url
 from flask_login import login_user, login_required, logout_user, current_user, LoginManager
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import db, Project, User, Courses
+from sqlalchemy import or_
+
 
 app = Flask(__name__)
 
