@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Explore Projects{% endblock %}
+
+{% block content %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explore</title>
+    <style>
+      
+    </style>
+</head>
+
+<body>
+    <h1>Explore</h1>
+
+
+
+
+    <form method="POST" action="/exploreX">
+        <h3>Select Categories:</h3>
+
+        <label><input type="checkbox" name="categories" value="ML"> ML</label><br>
+        <label><input type="checkbox" name="categories" value="AI"> AI</label><br>
+        <label><input type="checkbox" name="categories" value="Web Dev"> Web Dev</label><br>
+        <label><input type="checkbox" name="categories" value="Game Dev"> Game Dev</label><br>
+        <label><input type="checkbox" name="categories" value="NLP"> NLP</label><br>
+        <label><input type="checkbox" name="categories" value="Data Science"> Data Science</label><br>
+        <label><input type="checkbox" name="categories" value="Other"> Other</label><br>
+
+        <button type="submit">Explore Projects</button>
+    </form>
+    
+    
+
+
+    
+    <div class="main-container">
+     
+    </div>
+
+
+    <script>
+
+   
+   
+               
+
+
+    </script>
+</body>
+{% endblock %}

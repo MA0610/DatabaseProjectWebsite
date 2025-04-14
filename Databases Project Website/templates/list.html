@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Projects List{% endblock %}
+
+{% block head %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>List of Projects</title>
+    <style>
+        /* Add styles here if needed */
+    </style>
+{% endblock %}
+
+{% block content %}
+<h1>Project List</h1>
+{% if selected_categories %}
+    <p>Showing projects in categories: {{ ", ".join(selected_categories) }}</p>
+{% else %}
+    <p>Showing all projects.</p>
+{% endif %}
+<table border="1">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>User Name</th>
+            <th>Categories</th>
+            <th>Course</th>
+            <th>Description</th>
+            <th>GitHub Link</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for project in data %}
+            <tr>
+                <td>{{ project.id }}</td>
+                <td>{{ project.userName }}</td>
+                <td>{{ project.categories }}</td>
+                <td>{{ project.course }}</td>
+                <td>{{ project.description }}</td>
+                <td><a href="{{ project.githubLink }}" target="_blank">GitHub</a></td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<a href="/exploreProjects">Back to Explore</a>
+{% endblock %}
