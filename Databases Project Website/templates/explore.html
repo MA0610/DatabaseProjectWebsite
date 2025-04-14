@@ -20,14 +20,10 @@
     <form method="POST" action="/exploreX">
         <h3>Select Categories:</h3>
 
-        <label><input type="checkbox" name="categories" value="ML"> ML</label><br>
-        <label><input type="checkbox" name="categories" value="AI"> AI</label><br>
-        <label><input type="checkbox" name="categories" value="Web Dev"> Web Dev</label><br>
-        <label><input type="checkbox" name="categories" value="Game Dev"> Game Dev</label><br>
-        <label><input type="checkbox" name="categories" value="NLP"> NLP</label><br>
-        <label><input type="checkbox" name="categories" value="Data Science"> Data Science</label><br>
-        <label><input type="checkbox" name="categories" value="Other"> Other</label><br>
-
+        {% for category in categories %}
+        <label><input type="checkbox" name="categories" value="{{ category.category }}"> {{ category.name }}</label><br>
+        {% endfor %}
+        
         <button type="submit">Explore Projects</button>
     </form>
     
