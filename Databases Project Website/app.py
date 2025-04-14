@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify, render_template, flash, redirect, url_for, g
 from flask_login import login_user, login_required, logout_user, current_user, LoginManager
 from werkzeug.security import generate_password_hash, check_password_hash
-from models import db, Project, User
+from models import db, Project, User, Courses
 
 app = Flask(__name__)
 
@@ -116,7 +116,8 @@ def index():
 @app.route('/submitProject')
 @login_required
 def submit():
-    return render_template('submit.html')
+    courses = Courses.query.all()
+    return render_template('submit.html', courses=courses)
 
 
 @app.route('/grabProject', methods=['GET'])
@@ -165,9 +166,29 @@ def putProject():
 def explore():
     return render_template('explore.html')
 
-@app.route('/exploreX')
+@app.route('/exploreX', methods=['POST'])
 def exploreX():
-    return render_template('list.html')
+    selected_categories = request.form.getlist('categories')
+
+    if selected_categories:
+        #filtered_projects = Project.query.filter(Project.categories.in_(selected_categories)).all()
+        filters = [Project.categories.ilike(f"%{cat}%") for cat in selected_categories]
+        filtered_projects = Project.query.filter(or_(*filters)).all()
+    else:
+        filtered_projects = Project.query.all()
+
+    return render_template('list.html',
+                           data=filtered_projects,
+                           selected_categories=selected_categories)
+
+
+@app.route('/add-courses')
+def add_courses():
+    course_names = ["COMP 131", "COMP 373", "COMP 390", "COMP 490", "Personal Project"]
+    for name in course_names:
+        db.session.add(Courses(courseName=name))
+    db.session.commit()
+    return "Courses added!"
 
 @app.route('/list')
 def projects():
