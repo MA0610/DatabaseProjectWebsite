@@ -62,14 +62,12 @@
         <div class="add-Project-Categories">
             <label for="new-Project-Categories">Project Categories:</label>
             <div class="categoryCheckboxes">
-                <label><input type="checkbox" name="ML" value="ML" id="categoryML"> ML</label>
-                <label><input type="checkbox" name="AI" value="AI" id="categoryAI"> AI</label>
-                <label><input type="checkbox" name="Web Dev" value="Web Dev" id="categoryWebDev"> Web Dev</label>
-                <label><input type="checkbox" name="Game Dev" value="Game Dev" id="categoryGameDev"> Game Dev</label>
-                <label><input type="checkbox" name="NLP" value="NLP" id="categoryNLP"> NLP</label>
-                <label><input type="checkbox" name="Data Science" value="Data Science" id="categoryDataScience"> Data Science</label>
-                <label><input type="checkbox" name="Other" value="Other" id="categoryOther"> Other</label>
-
+                {% for category in categories %}
+                        <label>
+                            <input type="checkbox" value="{{ category.id }}" data-name="{{ category.name }}">
+                            {{ category.category }}
+                        </label>
+                    {% endfor %}
             </div>
         </div>
 
