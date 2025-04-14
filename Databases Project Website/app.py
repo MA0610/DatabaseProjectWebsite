@@ -74,9 +74,8 @@ def getTutorial():
 
 @app.route('/list')
 def projects():
-    data = get_data_from_db()  # Call the function to get data
-    print (data)
-    return render_template('list.html', data=data)
+    projects = Project.query.all()
+    return render_template('list.html', projects=projects)
 
 @app.route('/putProject',methods=['POST'])
 def putProject():
