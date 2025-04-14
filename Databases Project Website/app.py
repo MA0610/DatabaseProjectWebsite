@@ -11,7 +11,18 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 
 with app.app_context():
+    db.drop_all()
     db.create_all()  # Creates the database tables
+    default_categories = ["Machine Learning", "Artificial Intelligence", "Web Development", "Game Development", "Natural Language Processing", "Data Science", "Other"]
+    existing_categories = Category.query.all()
+    existing_category_names = [category.category for category in existing_categories]
+
+    for category_name in default_categories:
+        if category_name not in existing_category_names:
+            category = Category(category=category_name)
+            db.session.add(category)
+    
+    db.session.commit()  # Commit changes
 
 def get_data_from_db():
     # Use SQLAlchemy to query the Project table
@@ -41,7 +52,8 @@ def index():
 @app.route('/submitProject')
 def submit():
     courses = Courses.query.all()
-    return render_template('submit.html', courses=courses)
+    categories = Category.query.all()
+    return render_template('submit.html', courses=courses, categories=categories)
 
 
 @app.route('/exploreProjects')
