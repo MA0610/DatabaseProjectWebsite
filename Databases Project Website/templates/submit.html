@@ -53,10 +53,11 @@
 
     <div class="addProject">
         <h2>New Project</h2>
+        <p>Note: Do not put your username when putting project contributors, if you worked alone leave this blank! </p>
 
-        <div class="add-Project-Username">
-            <label for="new-Project-Username">Project Author:</label>
-            <textarea id="new-Project-Username" placeholder="Enter Username..." oninput="resizeTextarea(this)"></textarea>
+        <div class="add-Project-Contributors">
+            <label for="new-Project-Contributors">Project Contributors:</label>
+            <textarea id="new-Project-Contributors" placeholder="Enter Contributors" oninput="resizeTextarea(this)"></textarea>
         </div>
 
         <div class="add-Project-Categories">
@@ -71,17 +72,6 @@
                 <label><input type="checkbox" name="Other" value="Other" id="categoryOther"> Other</label>
 
             </div>
-        </div>
-
-
-        <div class="add-Project-Course">
-            <label for="new-Project-Course">Project Course:</label>
-            <select id="new-Project-Course">
-                <option value="" selected disabled>Select a course</option>
-                {% for course in courses %}
-                 <option value="{{ course.id }}">{{ course.courseName }}</option>
-                {% endfor %}
-            </select>
         </div>
 
         <div class="add-Project-Description">
@@ -122,7 +112,13 @@
     
         // Event listener for the submit button
         document.getElementById('submitButton').addEventListener('click', async () => {
-            const userName = document.getElementById('new-Project-Username').value;
+
+            const contributors = document.getElementById('new-Project-Contributors').value;
+
+            if(contributors==''){
+                tempContributors = "N/A"
+            }
+
             const description = document.getElementById('new-Project-Description').value;
     
             // Collect the selected categories
@@ -131,41 +127,33 @@
             categoryCheckboxes.forEach(checkbox => {
                 selectedCategories.push(checkbox.value);  // Push the value of the selected checkbox
             });
-
-
-
+    
             // Join the selected categories into a single string
             const categories = selectedCategories.length > 0 ? selectedCategories.join(', ') : ''; // Handle no selection
-
-            //Collect selected course id
-            const course = document.getElementById('new-Project-Course').value;
-
+    
             const link = document.getElementById('new-Project-Link').value;
     
             // Check if all fields are filled, including categories
-            if (!userName || !description || !categories || !course ||!link) {
+            if (!description || !categories || !link) {
                 alert("Please fill in all fields before submitting.");
                 return; 
             }
+
+          
     
             const requestData = {
-                projectAuthor: userName, 
+                projectContributors: tempContributors, 
                 projectDescription: description,
                 projectCategories: categories,
-                projectCourse: course,
                 projectLink: link
             };
     
             // Reset form fields
-            document.getElementById('new-Project-Username').value = '';
+            document.getElementById('new-Project-Contributors').value = '';
             document.getElementById('new-Project-Description').value = '';
             document.getElementById('new-Project-Link').value = '';
              // Uncheck all checkboxes
-            const catCheckboxes = document.querySelectorAll('.categoryCheckboxes input[type="checkbox"]');
-            catCheckboxes.forEach(checkbox => {
-                checkbox.checked = false;  // Uncheck each checkbox
-            });
-            const checkboxes = document.querySelectorAll('.courseCheckboxes input[type="checkbox"]');
+            const checkboxes = document.querySelectorAll('.categoryCheckboxes input[type="checkbox"]');
             checkboxes.forEach(checkbox => {
                 checkbox.checked = false;  // Uncheck each checkbox
             });
