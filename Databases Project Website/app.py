@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify, render_template, Blueprint  
-from models import db, Project
+from models import db, Project, Courses
 from sqlalchemy import or_
 
 
@@ -40,7 +40,8 @@ def index():
 
 @app.route('/submitProject')
 def submit():
-    return render_template('submit.html')
+    courses = Courses.query.all()
+    return render_template('submit.html', courses=courses)
 
 
 @app.route('/exploreProjects')
@@ -83,9 +84,13 @@ def putProject():
 
     projectUser = data.get('projectAuthor')
     projectCategories = data.get('projectCategories')
-    projectCourse = data.get('projectCourse')
+    projectCourse = int(data.get('projectCourse'))#convert to integer for ID
     projectDescription = data.get('projectDescription')
     projectLink = data.get('projectLink')
+
+    # verify course exists
+    if not Courses.query.get(projectCourse):
+        return jsonify(success=False, message="Invalid course ID"), 400
   
     newProject = Project(
         userName = projectUser,
@@ -99,6 +104,14 @@ def putProject():
     db.session.commit()
 
     return jsonify(success=True, message="Project added successfully")
+
+@app.route('/add-courses')
+def add_courses():
+    course_names = ["COMP 131", "COMP 373", "COMP 390", "COMP 490", "Personal Project"]
+    for name in course_names:
+        db.session.add(Courses(courseName=name))
+    db.session.commit()
+    return "Courses added!"
 
 
 @app.route('/test', methods=['GET'])

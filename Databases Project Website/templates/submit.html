@@ -73,17 +73,15 @@
             </div>
         </div>
 
+
         <div class="add-Project-Course">
             <label for="new-Project-Course">Project Course:</label>
-            <div class="courseCheckboxes">
-                <label><input type="checkbox" name="Personal Project" value="Personal Project" id="PersonalProject"> Personal Project</label>
-                <label><input type="checkbox" name="COMP 490" value="COMP 490" id="COMP 490"> COMP 490</label>
-                <label><input type="checkbox" name="COMP 390" value="COMP 390" id="COMP 390"> COMP 390</label>
-                <label><input type="checkbox" name="COMP 373" value="COMP 373" id="COMP 373"> COMP 373</label>
-                <label><input type="checkbox" name="COMP 131" value="COMP 131" id="COMP 131"> COMP 131</label>
-
-
-            </div>
+            <select id="new-Project-Course">
+                <option value="" selected disabled>Select a course</option>
+                {% for course in courses %}
+                 <option value="{{ course.id }}">{{ course.courseName }}</option>
+                {% endfor %}
+            </select>
         </div>
 
         <div class="add-Project-Description">
@@ -134,18 +132,13 @@
                 selectedCategories.push(checkbox.value);  // Push the value of the selected checkbox
             });
 
-            //Collect selected course
-            let selectedCourse = [];
-            const courseCheckboxes = document.querySelectorAll('.courseCheckboxes input[type="checkbox"]:checked');
-            courseCheckboxes.forEach(checkbox => {
-                selectedCourse.push(checkbox.value);  // Push the value of the selected checkbox
-            });
+
 
             // Join the selected categories into a single string
             const categories = selectedCategories.length > 0 ? selectedCategories.join(', ') : ''; // Handle no selection
 
-            // Join the selected courses into a single string
-            const course = selectedCourse.length > 0 ? selectedCourse.join(', ') : ''; // Handle no selection
+            //Collect selected course id
+            const course = document.getElementById('new-Project-Course').value;
 
             const link = document.getElementById('new-Project-Link').value;
     
