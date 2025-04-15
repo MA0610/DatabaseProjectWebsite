@@ -74,6 +74,16 @@
             </div>
         </div>
 
+        <div class="add-Project-Course">
+            <label for="new-Project-Course">Project Course:</label>
+            <select id="new-Project-Course">
+                <option value="" selected disabled>Select a course</option>
+                {% for course in courses %}
+                 <option value="{{ course.id }}">{{ course.courseName }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
         <div class="add-Project-Description">
             <label for="new-Project-Description">Project Description:</label>
             <textarea id="new-Project-Description" placeholder="Enter Description..." oninput="resizeTextarea(this)"></textarea>
@@ -131,6 +141,9 @@
             // Join the selected categories into a single string
             const categories = selectedCategories.length > 0 ? selectedCategories.join(', ') : ''; // Handle no selection
     
+            const course = document.getElementById('new-Project-Course').value;
+
+
             const link = document.getElementById('new-Project-Link').value;
     
             // Check if all fields are filled, including categories
@@ -145,6 +158,7 @@
                 projectContributors: tempContributors, 
                 projectDescription: description,
                 projectCategories: categories,
+                projectCourse: course,
                 projectLink: link
             };
     
@@ -152,11 +166,17 @@
             document.getElementById('new-Project-Contributors').value = '';
             document.getElementById('new-Project-Description').value = '';
             document.getElementById('new-Project-Link').value = '';
-             // Uncheck all checkboxes
-            const checkboxes = document.querySelectorAll('.categoryCheckboxes input[type="checkbox"]');
-            checkboxes.forEach(checkbox => {
+            
+            // Uncheck all checkboxes
+            const catCheckboxes = document.querySelectorAll('.categoryCheckboxes input[type="checkbox"]');
+            catCheckboxes.forEach(checkbox => {
                 checkbox.checked = false;  // Uncheck each checkbox
             });
+            // const checkboxes = document.querySelectorAll('.courseCheckboxes input[type="checkbox"]');
+            // checkboxes.forEach(checkbox => {
+            //     checkbox.checked = false;  // Uncheck each checkbox
+            // });
+    
     
             resetTextareaSize();
     
