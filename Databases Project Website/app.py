@@ -85,13 +85,36 @@ def get_NOT_APPROVED_data_from_db():
 
     return data
 
+def get_APPROVED_data_from_db():
+    # Use SQLAlchemy to query the Project table
+
+    projects = Project.query.filter_by(isApproved=True).all()
+
+
+    # Format the results as a list of dictionaries to pass to the template
+    data = []
+    for project in projects:
+        project_data = {
+            "id": project.id,
+            "userName": project.userName,
+            "categories": project.categories,
+            "description": project.description,
+            "githubLink": project.githubLink,
+            "contributors": project.contributors,
+            "isApproved": project.isApproved
+        }
+        data.append(project_data)
+
+    return data
+
 @app.route('/admin')
 @login_required
 def admin():
     tempUser = User.query.filter_by(id=current_user.get_id()).first()
     if(tempUser.isAdmin == True):
         data = get_NOT_APPROVED_data_from_db()
-        return render_template('admin.html', data=data)
+        approvedData = get_APPROVED_data_from_db()
+        return render_template('admin.html', data=data, approvedData = approvedData)
     else:
         return render_template('home.html')
 
@@ -117,7 +140,25 @@ def approve():
         return jsonify(success=False, message=str(e)), 500
 
 
+@app.route('/un-approveProject', methods=['POST'])
+def unApprove():
+    data = request.json  
 
+    if not isinstance(data, list):
+        return jsonify(success=False, message="Invalid data format. Expecting a list of IDs."), 400
+
+    try:
+        Project.query.filter(Project.id.in_(data)).update(
+            {Project.isApproved: False},  
+            synchronize_session=False
+        )
+        db.session.commit()
+
+        return jsonify(success=True, message="Project(s) un-approved successfully!")
+    
+    except Exception as e:
+        db.session.rollback()
+        return jsonify(success=False, message=str(e)), 500
 
 @app.route('/')
 def index():
