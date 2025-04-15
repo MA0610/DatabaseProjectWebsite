@@ -22,9 +22,9 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(150), nullable=False)
     isAdmin = db.Column(db.Boolean, nullable=False) #Would need to manually add users as admin either preBoot or through hidden page through root user
                                        #This would be done at project boot
-    projects = db.relationship('Project', back_populates='course_relation')
+    projects = db.relationship('Project')
 
 class Courses(db.Model):
     id = db.Column(db.Integer, primary_key = True)
-    courseName = db.Column(db.String(50), nullable = False)
+    courseName = db.Column(db.String(50), nullable = False, unique=True)
     projects = db.relationship('Project', back_populates='course_relation')
