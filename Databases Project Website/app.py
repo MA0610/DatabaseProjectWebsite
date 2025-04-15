@@ -25,7 +25,15 @@ db.init_app(app)
 
 with app.app_context():
     db.create_all()  # Creates the database tables
+    if not Courses.query.first():   #populates the Courses table with values at app creation
+        course_names = ["COMP 131", "COMP 373", "COMP 390", "COMP 490", "Personal Project"]
+        for name in course_names:
+            db.session.add(Courses(courseName=name))
+        db.session.commit()
 
+    if not User.query.first():   #populates the User table with admin user(s) at app creation
+        db.session.add(User(email="root@gmail.com", uName="toor", password= "rootoor", isAdmin=True))
+        db.session.commit()
 
 
 # User loader function for Flask-Login
@@ -36,7 +44,7 @@ def load_user(user_id):
 def get_data_from_db():
     # Use SQLAlchemy to query the Project table
     projects = Project.query.all()  # Get all projects from the 'project' table
-
+    courses = Courses.query.all()
     # Format the results as a list of dictionaries to pass to the template
     data = []
     for project in projects:
@@ -44,6 +52,7 @@ def get_data_from_db():
             "id": project.id,
             "userName": project.userName,
             "categories": project.categories,
+            "course": project.course,
             "description": project.description,
             "githubLink": project.githubLink,
             "contributors": project.contributors,
@@ -144,15 +153,22 @@ def putProject():
 
     projectUser = userInfo
     projectCategories = data.get('projectCategories')
+    projectCourse = int(data.get('projectCourse'))#convert to integer for ID
     projectDescription = data.get('projectDescription')
     projectLink = data.get('projectLink')
     projectContributors = data.get('projectContributors')
     projectApproval = False
 
+
+    if not Courses.query.get(projectCourse):
+        return jsonify(success=False, message="Invalid course ID"), 400
+  
+
     newProject = Project(
         userName=projectUser,
         categories=projectCategories,
         description=projectDescription,
+        course = projectCourse,
         githubLink=projectLink,
         contributors = projectContributors,
         isApproved = projectApproval
@@ -183,14 +199,9 @@ def exploreX():
                            data=filtered_projects,
                            selected_categories=selected_categories)
 
-
-@app.route('/add-courses')
-def add_courses():
-    course_names = ["COMP 131", "COMP 373", "COMP 390", "COMP 490", "Personal Project"]
-    for name in course_names:
-        db.session.add(Courses(courseName=name))
-    db.session.commit()
-    return "Courses added!"
+@app.route('/projectList')
+def allProjects():
+    return render_template('list.html', data = Project.query.all())
 
 @app.route('/list')
 def projects():
@@ -214,6 +225,7 @@ def test():
             "username": projects.userName,
             "description": projects.description,
             "categories": projects.categories,
+            "courseId": projects.course,
             "githubLink": projects.githubLink,
             "contributors": projects.contributors,
             "isApproved": projects.isApproved
@@ -245,7 +257,21 @@ def testUsers():
     return jsonify(allUsers)
 
 
+@app.route('/testCourses', methods=['GET'])
+def testCourses():
+    allCourses = []
 
+    courseValues = Courses.query.all()
+
+    for course in courseValues:
+        course_data = {
+            "id": course.id,
+            "courseName": course.courseName
+        }
+
+        allCourses.append(course_data)
+
+    return jsonify(allCourses)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -315,12 +341,12 @@ def sign_up():
             message = 'Password must be at least 7 characters.'
             message_type = 'error'
         else:
-            if(email == 'root@gmail.com'):
-                isAdminValue = True
-            else:
-                isAdminValue = False
+            # if(email == 'root@gmail.com'):
+            #     isAdminValue = True
+            # else:
+            #     isAdminValue = False
 
-            new_user = User(email=email, uName=uName, password=generate_password_hash(password1, method='pbkdf2:sha256'), isAdmin= isAdminValue)
+            new_user = User(email=email, uName=uName, password=generate_password_hash(password1, method='pbkdf2:sha256'), isAdmin= False)
             db.session.add(new_user)
             db.session.commit()
             message = 'Account created successfully!'
