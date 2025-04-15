@@ -80,6 +80,39 @@
 
     <button type="button" id="approvalSubmissionBtn">Submit Approvals</button>  
 
+
+    <!--  -->
+    <h1>Project Un-Approval</h1>
+
+    <table id="Un-ApproveTable" border="1">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>User Name</th>
+                <th>Categories</th>
+                <th>Course</th>
+                <th>Description</th>
+                <th>GitHub Link</th>
+                <th>Un-Approve?</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for project in approvedData %}
+                <tr>
+                    <td>{{ project.id }}</td>
+                    <td>{{ project.userName }}</td>
+                    <td>{{ project.categories }}</td>
+                    <td>{{ project.course }}</td>
+                    <td>{{ project.description }}</td>
+                    <td><a href="{{ project.githubLink }}" target="_blank">GitHub</a></td>
+                    <td><input type= "checkbox" id= '{{ project.id }}' value="{{ project.id }}" class= "un-approve-checkbox"></td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <button type="button" id="un-approvalSubmissionBtn">Submit Un-Approvals</button>  
+
    
 
     <div class="main-container">
@@ -139,44 +172,44 @@ try {
 alert('Project(s) approved!');
 });
 
+///////////
 
 
-    // document.getElementById('approvalSubmissionBtn').addEventListener('click', async () => {
+document.getElementById('un-approvalSubmissionBtn').addEventListener('click', async () => {
 
-    //     const checkboxValues = document.querySelectorAll('.approve-checkbox');
+const checkboxValues = document.querySelectorAll('.un-approve-checkbox');
 
-    //     const idsApproved = [checkboxValues.length]
-        
+const idsApproved = [];
 
-    //     for(var i=0;i<checkboxValues.length;i++){
-    //         if(checkboxValues[i].checked){
-    //             idsApproved[i] = checkboxValues[i];
-    //         }
-    //     }
-
+for (let i = 0; i < checkboxValues.length; i++) {
+    if (checkboxValues[i].checked) {
+        idsApproved.push(checkboxValues[i].value); 
+    }
+}
 
 
-    //     try {        
-    //         const response = await fetch('/approveProject', {
-    //             method: 'POST',
-    //             headers: {
-    //                 'Content-Type': 'application/json'
-    //             },
-    //             body: JSON.stringify(idsApproved)
-    //         });
+try {
+    const response = await fetch('/un-approveProject', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(idsApproved)
+    });
 
-    //         const data = await response.json();
-    //         if (data.success) {
-    //             console.log('Project(s) approved successfully!');
-    //         } else {
-    //             console.error('Error approving project(s)');
-    //         }
-    //     } catch (error) {
-    //         console.error('Error during fetch:', error);
-    //     }
+    const data = await response.json();
+    if (data.success) {
+        console.log('Project(s) un-approved successfully!');
+    } else {
+        console.error('Error un-approving project(s)');
+    }
+} catch (error) {
+    console.error('Error during fetch:', error);
+}
 
-    //     alert('Project(s) approved!');
-    //     });
+alert('Project(s) un-approved!');
+});
+
 
 
 
