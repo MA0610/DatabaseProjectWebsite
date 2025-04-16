@@ -25,6 +25,13 @@ db.init_app(app)
 
 with app.app_context():
     db.create_all()  # Creates the database tables
+    
+    if not Category.query.first(): #populates the Category table with values at app creation
+        default_categories = ["Machine Learning", "Artificial Intelligence", "Web Development", "Game Development", "Natural Language Processing", "Data Science", "Other"]
+        for category_name in default_categories:
+            db.session.add(Category(name=category_name))
+        db.session.commit() #is this redundant
+        
     if not Courses.query.first():   #populates the Courses table with values at app creation
         course_names = ["COMP 131", "COMP 373", "COMP 390", "COMP 490", "Personal Project"]
         for name in course_names:
@@ -44,7 +51,7 @@ def load_user(user_id):
 def get_data_from_db():
     # Use SQLAlchemy to query the Project table
     projects = Project.query.all()  # Get all projects from the 'project' table
-    courses = Courses.query.all()
+    courses = Courses.query.all() #is this necessary
     # Format the results as a list of dictionaries to pass to the template
     data = []
     for project in projects:
@@ -170,8 +177,9 @@ def index():
 @app.route('/submitProject')
 @login_required
 def submit():
+    categories = Category.query.all()
     courses = Courses.query.all()
-    return render_template('submit.html', courses=courses)
+    return render_template('submit.html', courses=courses, categories=categories)
 
 
 @app.route('/grabProject', methods=['GET'])
@@ -196,12 +204,13 @@ def putProject():
 
     projectUser = userInfo
     projectCategories = data.get('projectCategories')
+    categories = Category.query.filter(Category.id.in_([int(id) for id in projectCategories])).all()
     projectCourse = int(data.get('projectCourse'))#convert to integer for ID
     projectDescription = data.get('projectDescription')
     projectLink = data.get('projectLink')
     projectContributors = data.get('projectContributors')
     projectApproval = False
-
+    
 
     if not Courses.query.get(projectCourse):
         return jsonify(success=False, message="Invalid course ID"), 400
@@ -209,7 +218,7 @@ def putProject():
 
     newProject = Project(
         userName=projectUser,
-        categories=projectCategories,
+        categories=categories,
         description=projectDescription,
         course = projectCourse,
         githubLink=projectLink,
@@ -233,8 +242,8 @@ def exploreX():
 
     if selected_categories:
         #filtered_projects = Project.query.filter(Project.categories.in_(selected_categories)).all()
-        filters = [Project.categories.ilike(f"%{cat}%") for cat in selected_categories]
-        filtered_projects = Project.query.filter(or_(*filters)).all()
+        filtered_projects = Project.query.join(Project.categories).filter(Category.name.in_(selected_categories)).all()
+        #filtered_projects = Project.query.filter(or_(*filters)).all()
     else:
         filtered_projects = Project.query.all()
 
@@ -267,7 +276,7 @@ def test():
             "id": projects.id,
             "username": projects.userName,
             "description": projects.description,
-            "categories": projects.categories,
+            "categories": [cat.id for cat in projects.categories], #does it make more sense to see ids or names?
             "courseId": projects.course,
             "githubLink": projects.githubLink,
             "contributors": projects.contributors,
