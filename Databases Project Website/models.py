@@ -3,11 +3,16 @@ from flask_login import UserMixin
 
 db = SQLAlchemy()
 
+category_association = db.Table('category_association',
+    db.Column('project_id', db.Integer, db.ForeignKey('project.id'), primary_key = True),
+    db.Column('category_id', db.Integer, db.ForeignKey('category.id'), primary_key = True),
+    extend_existing=True
+)
 
 class Project(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     userName = db.Column(db.String(150), db.ForeignKey('user.uName'))
-    categories = db.Column(db.String(100), nullable=False)
+    categories = db.relationship('Category', secondary=category_association, backref='projects')
     course = db.Column(db.Integer, db.ForeignKey('courses.id'), nullable=False)
     description = db.Column(db.String(10000), nullable=False)
     githubLink = db.Column(db.String(100), nullable=False)
@@ -28,3 +33,7 @@ class Courses(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     courseName = db.Column(db.String(50), nullable = False, unique=True)
     projects = db.relationship('Project', back_populates='course_relation')
+
+class Category(db.Model):
+    id = db.Column(db.Integer, primary_key = True)
+    name = db.Column(db.String(50), nullable = False, unique=True)
