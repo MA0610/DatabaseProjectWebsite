@@ -18,8 +18,12 @@
     <form method="POST" action="/exploreX">
         <h3>Select Categories:</h3>
 
+        <!-- "All" checkbox # though we can take out -->
+        <input type="checkbox" id="select-all"> <strong>All</strong><br>
+
+        <!-- Category checkboxes -->
         {% for category in categories %}
-        <input type="checkbox" name="categories" value="{{ category.name }}"> {{ category.name }}
+            <input type="checkbox" class="category-checkbox" name="categories" value="{{ category.name }}"> {{ category.name }}<br>
         {% endfor %}
 
         <button type="submit">Explore Projects</button>
@@ -48,7 +52,19 @@
 
 
     <script>
-        // Any JavaScript functionality can go here
+        const selectAll = document.getElementById('select-all');
+        const checkboxes = document.querySelectorAll('.category-checkbox');
+
+        selectAll.addEventListener('change', () => {
+            checkboxes.forEach(cb => cb.checked = selectAll.checked);
+        });
+
+        checkboxes.forEach(cb => {
+            cb.addEventListener('change', () => {
+                const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+                selectAll.checked = allChecked;
+            });
+        });
     </script>
 </body>
 {% endblock %}
