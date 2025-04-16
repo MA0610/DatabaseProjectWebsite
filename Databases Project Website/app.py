@@ -234,7 +234,8 @@ def putProject():
 
 @app.route('/exploreProjects')
 def explore():
-    return render_template('explore.html')
+    categories = Category.query.all()
+    return render_template('explore.html', categories=categories)
 
 @app.route('/exploreX', methods=['POST'])
 def exploreX():
