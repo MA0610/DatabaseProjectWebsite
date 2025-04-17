@@ -39,9 +39,8 @@ with app.app_context():
         db.session.commit()
 
     if not User.query.first():   #populates the User table with admin user(s) at app creation
-        db.session.add(User(email="root@gmail.com", uName="toor", password= "rootoor", isAdmin=True))
+        db.session.add(User(email="root@gmail.com", uName="toor", password = generate_password_hash("rootoor", method='pbkdf2:sha256'), isAdmin=True))
         db.session.commit()
-
 
 # User loader function for Flask-Login
 @login_manager.user_loader
@@ -397,7 +396,7 @@ def sign_up():
             # if(email == 'root@gmail.com'):
             #     isAdminValue = True
             # else:
-            #     isAdminValue = False
+                isAdminValue = False
 
             new_user = User(email=email, uName=uName, password=generate_password_hash(password1, method='pbkdf2:sha256'), isAdmin= False)
             db.session.add(new_user)
