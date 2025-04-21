@@ -62,7 +62,7 @@ def get_data_from_db():
             "description": project.description,
             "githubLink": project.githubLink,
             "contributors": project.contributors,
-            "isApproved": project.isApproved
+            "postStatus": project.postStatus
         }
         data.append(project_data)
 
@@ -70,7 +70,7 @@ def get_data_from_db():
 
 
 def get_NOT_APPROVED_data_from_db():
-    projects = Project.query.filter_by(isApproved=False).all()
+    projects = Project.query.filter_by(postStatus="unapproved" or "disapproved" or "archived").all()
     data = []
     for project in projects:
         category_names = [cat.name for cat in project.categories]
@@ -82,7 +82,7 @@ def get_NOT_APPROVED_data_from_db():
             "description": project.description,
             "githubLink": project.githubLink,
             "contributors": project.contributors,
-            "isApproved": project.isApproved
+            "postStatus": project.postStatus
         }
         data.append(project_data)
     return data
@@ -91,7 +91,7 @@ def get_NOT_APPROVED_data_from_db():
 def get_APPROVED_data_from_db():
     # Use SQLAlchemy to query the Project table
 
-    projects = Project.query.filter_by(isApproved=True).all()
+    projects = Project.query.filter_by(postStatus = "approved").all()
 
 
     data = []
@@ -105,7 +105,7 @@ def get_APPROVED_data_from_db():
             "description": project.description,
             "githubLink": project.githubLink,
             "contributors": project.contributors,
-            "isApproved": project.isApproved
+            "postStatus": project.postStatus
         }
         data.append(project_data)
     return data
@@ -131,7 +131,7 @@ def approve():
 
     try:
         Project.query.filter(Project.id.in_(data)).update(
-            {Project.isApproved: True},  
+            {Project.postStatus: "approved"},
             synchronize_session=False
         )
         db.session.commit()
@@ -152,7 +152,7 @@ def unApprove():
 
     try:
         Project.query.filter(Project.id.in_(data)).update(
-            {Project.isApproved: False},  
+            {Project.postStatus: "disapproved"},
             synchronize_session=False
         )
         db.session.commit()
@@ -212,7 +212,7 @@ def putProject():
     projectDescription = data.get('projectDescription')
     projectLink = data.get('projectLink')
     projectContributors = data.get('projectContributors')
-    projectApproval = False
+    projectApproval = "unapproved"
 
     if projectContributors == '':
         projectContributors = "N/A"
@@ -227,7 +227,7 @@ def putProject():
         course=projectCourse,
         githubLink=projectLink,
         contributors=projectContributors,
-        isApproved=projectApproval
+        psotStatus=projectApproval
     )
 
     db.session.add(newProject)
@@ -324,7 +324,7 @@ def test():
             "courseId": projects.course,
             "githubLink": projects.githubLink,
             "contributors": projects.contributors,
-            "isApproved": projects.isApproved
+            "postStatus": projects.postStatus
         }
 
 
