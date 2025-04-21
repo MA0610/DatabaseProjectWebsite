@@ -56,6 +56,7 @@
             <tr>
                 <th>ID</th>
                 <th>User Name</th>
+                <th>Contributors</th>
                 <th>Categories</th>
                 <th>Course</th>
                 <th>Description</th>
@@ -68,11 +69,16 @@
                 <tr>
                     <td>{{ project.id }}</td>
                     <td>{{ project.userName }}</td>
-                    <td>{{ project.categories }}</td>
+                    <td>{{project.contributors}}</td>
+                    <td>
+                        {% for cat in project.categories %}
+                            {{ cat }}{% if not loop.last %}, {% endif %}
+                        {% endfor %}
+                    </td>
                     <td>{{ project.course }}</td>
                     <td>{{ project.description }}</td>
                     <td><a href="{{ project.githubLink }}" target="_blank">GitHub</a></td>
-                    <td><input type= "checkbox" id= '{{ project.id }}' value="{{ project.id }}" class= "approve-checkbox"></td>
+                    <td><input type="checkbox" id="{{ project.id }}" value="{{ project.id }}" class="approve-checkbox"></td>
                 </tr>
             {% endfor %}
         </tbody>
@@ -80,8 +86,6 @@
 
     <button type="button" id="approvalSubmissionBtn">Submit Approvals</button>  
 
-
-    <!--  -->
     <h1>Project Un-Approval</h1>
 
     <table id="Un-ApproveTable" border="1">
@@ -89,6 +93,7 @@
             <tr>
                 <th>ID</th>
                 <th>User Name</th>
+                <th>Contributors</th>
                 <th>Categories</th>
                 <th>Course</th>
                 <th>Description</th>
@@ -101,11 +106,16 @@
                 <tr>
                     <td>{{ project.id }}</td>
                     <td>{{ project.userName }}</td>
-                    <td>{{ project.categories }}</td>
+                    <td>{{ project.contributors }}</td>
+                    <td>
+                        {% for cat in project.categories %}
+                            {{ cat }}{% if not loop.last %}, {% endif %}
+                        {% endfor %}
+                    </td>
                     <td>{{ project.course }}</td>
                     <td>{{ project.description }}</td>
                     <td><a href="{{ project.githubLink }}" target="_blank">GitHub</a></td>
-                    <td><input type= "checkbox" id= '{{ project.id }}' value="{{ project.id }}" class= "un-approve-checkbox"></td>
+                    <td><input type="checkbox" id="{{ project.id }}" value="{{ project.id }}" class="un-approve-checkbox"></td>
                 </tr>
             {% endfor %}
         </tbody>
@@ -113,108 +123,166 @@
 
     <button type="button" id="un-approvalSubmissionBtn">Submit Un-Approvals</button>  
 
-   
+    <!-- Add Course & Category Form -->
+    <h2>Add New Course or Category</h2>
+    <div class="add-form">
+        <form id="addCourseForm">
+            <div>
+                <label for="courseName">Course Name:</label>
+                <input type="text" id="courseName" placeholder="Enter Course Name">
+            </div>
+            <button type="submit" id="addCourseBtn">Add Course</button>
+        </form>
 
-    <div class="main-container">
-     
+        <form id="addCategoryForm">
+            <div>
+                <label for="categoryName">Category Name:</label>
+                <input type="text" id="categoryName" placeholder="Enter Category Name">
+            </div>
+            <button type="submit" id="addCategoryBtn">Add Category</button>
+        </form>
     </div>
 
-    <script>
-        // Function to resize the textarea dynamically based on content
-        function resizeTextarea(textarea) {
-            // Reset the height to auto to shrink back if content is deleted
-            textarea.style.height = 'auto';
-            // Set the height to fit the content
-            textarea.style.height = (textarea.scrollHeight) + 'px';
-        }
-    
-        // Reset the textareas to their original size
-        function resetTextareaSize() {
-            const textareas = document.querySelectorAll('textarea');
-            textareas.forEach(textarea => {
-                textarea.style.height = '50px'; // Reset to original min-height
-            });
-        }
+    <div class="main-container"></div>
 
+    <script>
 
         document.getElementById('approvalSubmissionBtn').addEventListener('click', async () => {
 
-const checkboxValues = document.querySelectorAll('.approve-checkbox');
+        const checkboxValues = document.querySelectorAll('.approve-checkbox');
 
-const idsApproved = [];
+        const idsApproved = [];
 
-for (let i = 0; i < checkboxValues.length; i++) {
-    if (checkboxValues[i].checked) {
-        idsApproved.push(checkboxValues[i].value); 
-    }
-}
-
-
-try {
-    const response = await fetch('/approveProject', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(idsApproved)
-    });
-
-    const data = await response.json();
-    if (data.success) {
-        console.log('Project(s) approved successfully!');
-    } else {
-        console.error('Error approving project(s)');
-    }
-} catch (error) {
-    console.error('Error during fetch:', error);
-}
-
-alert('Project(s) approved!');
-});
-
-///////////
+        for (let i = 0; i < checkboxValues.length; i++) {
+            if (checkboxValues[i].checked) {
+                idsApproved.push(checkboxValues[i].value); 
+            }
+        }
 
 
-document.getElementById('un-approvalSubmissionBtn').addEventListener('click', async () => {
+        try {
+            const response = await fetch('/approveProject', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(idsApproved)
+            });
 
-const checkboxValues = document.querySelectorAll('.un-approve-checkbox');
+            const data = await response.json();
+            if (data.success) {
+                console.log('Project(s) approved successfully!');
+            } else {
+                console.error('Error approving project(s)');
+            }
+        } catch (error) {
+            console.error('Error during fetch:', error);
+        }
 
-const idsApproved = [];
+        alert('Project(s) approved!');
+        });
 
-for (let i = 0; i < checkboxValues.length; i++) {
-    if (checkboxValues[i].checked) {
-        idsApproved.push(checkboxValues[i].value); 
-    }
-}
-
-
-try {
-    const response = await fetch('/un-approveProject', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(idsApproved)
-    });
-
-    const data = await response.json();
-    if (data.success) {
-        console.log('Project(s) un-approved successfully!');
-    } else {
-        console.error('Error un-approving project(s)');
-    }
-} catch (error) {
-    console.error('Error during fetch:', error);
-}
-
-alert('Project(s) un-approved!');
-});
+        ///////////
 
 
+        document.getElementById('un-approvalSubmissionBtn').addEventListener('click', async () => {
+
+        const checkboxValues = document.querySelectorAll('.un-approve-checkbox');
+
+        const idsApproved = [];
+
+        for (let i = 0; i < checkboxValues.length; i++) {
+            if (checkboxValues[i].checked) {
+                idsApproved.push(checkboxValues[i].value); 
+            }
+        }
 
 
+        try {
+            const response = await fetch('/un-approveProject', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(idsApproved)
+            });
 
+            const data = await response.json();
+            if (data.success) {
+                console.log('Project(s) un-approved successfully!');
+            } else {
+                console.error('Error un-approving project(s)');
+            }
+        } catch (error) {
+            console.error('Error during fetch:', error);
+        }
+
+        alert('Project(s) un-approved!');
+        });
+
+
+        // Add Course Form Submission
+        document.getElementById('addCourseForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const courseName = document.getElementById('courseName').value;
+
+            if (!courseName) {
+                alert("Please enter a course name.");
+                return;
+            }
+
+            try {
+                const response = await fetch('/addCourse', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ courseName })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    alert("Course added successfully!");
+                    document.getElementById('courseName').value = '';
+                } else {
+                    alert("Error adding course.");
+                }
+            } catch (error) {
+                console.error("Error during fetch:", error);
+            }
+        });
+
+        // Add Category Form Submission
+        document.getElementById('addCategoryForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const categoryName = document.getElementById('categoryName').value;
+
+            if (!categoryName) {
+                alert("Please enter a category name.");
+                return;
+            }
+
+            try {
+                const response = await fetch('/addCategory', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ categoryName })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    alert("Category added successfully!");
+                    document.getElementById('categoryName').value = '';
+                } else {
+                    alert("Error adding category.");
+                }
+            } catch (error) {
+                console.error("Error during fetch:", error);
+            }
+        });
     </script>
-    
+
 </body>
 {% endblock %}
