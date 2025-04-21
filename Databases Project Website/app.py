@@ -25,13 +25,6 @@ db.init_app(app)
 
 with app.app_context():
     db.create_all()  # Creates the database tables
-    
-    if not Category.query.first(): #populates the Category table with values at app creation
-        default_categories = ["Machine Learning", "Artificial Intelligence", "Web Development", "Game Development", "Natural Language Processing", "Data Science", "Other"]
-        for category_name in default_categories:
-            db.session.add(Category(name=category_name))
-        db.session.commit() #is this redundant
-        
     if not Courses.query.first():   #populates the Courses table with values at app creation
         course_names = ["COMP 131", "COMP 373", "COMP 390", "COMP 490", "Personal Project"]
         for name in course_names:
@@ -42,6 +35,13 @@ with app.app_context():
         db.session.add(User(email="root@gmail.com", uName="toor", password = generate_password_hash("rootoor", method='pbkdf2:sha256'), isAdmin=True))
         db.session.commit()
 
+    if not Category.query.first(): #populates the Category table with values at app creation
+        default_categories = ["Machine Learning", "Artificial Intelligence", "Web Development", "Game Development", "Natural Language Processing", "Data Science", "Other"]
+        for category_name in default_categories:
+            db.session.add(Category(name=category_name))
+        db.session.commit() #is this redundant
+        
+
 # User loader function for Flask-Login
 @login_manager.user_loader
 def load_user(user_id):
@@ -50,7 +50,7 @@ def load_user(user_id):
 def get_data_from_db():
     # Use SQLAlchemy to query the Project table
     projects = Project.query.all()  # Get all projects from the 'project' table
-    courses = Courses.query.all() #is this necessary
+    courses = Courses.query.all()
     # Format the results as a list of dictionaries to pass to the template
     data = []
     for project in projects:
@@ -70,18 +70,14 @@ def get_data_from_db():
 
 
 def get_NOT_APPROVED_data_from_db():
-    # Use SQLAlchemy to query the Project table
-
     projects = Project.query.filter_by(isApproved=False).all()
-
-
-    # Format the results as a list of dictionaries to pass to the template
     data = []
     for project in projects:
+        category_names = [cat.name for cat in project.categories]
         project_data = {
             "id": project.id,
             "userName": project.userName,
-            "categories": project.categories,
+            "categories": category_names,
             "course": project.course_relation.courseName,
             "description": project.description,
             "githubLink": project.githubLink,
@@ -89,8 +85,8 @@ def get_NOT_APPROVED_data_from_db():
             "isApproved": project.isApproved
         }
         data.append(project_data)
-
     return data
+
 
 def get_APPROVED_data_from_db():
     # Use SQLAlchemy to query the Project table
@@ -98,13 +94,13 @@ def get_APPROVED_data_from_db():
     projects = Project.query.filter_by(isApproved=True).all()
 
 
-    # Format the results as a list of dictionaries to pass to the template
     data = []
     for project in projects:
+        category_names = [cat.name for cat in project.categories]
         project_data = {
             "id": project.id,
             "userName": project.userName,
-            "categories": project.categories,
+            "categories": category_names,
             "course": project.course_relation.courseName,
             "description": project.description,
             "githubLink": project.githubLink,
@@ -112,7 +108,6 @@ def get_APPROVED_data_from_db():
             "isApproved": project.isApproved
         }
         data.append(project_data)
-
     return data
 
 @app.route('/admin')
@@ -176,9 +171,22 @@ def index():
 @app.route('/submitProject')
 @login_required
 def submit():
-    categories = Category.query.all()
     courses = Courses.query.all()
-    return render_template('submit.html', courses=courses, categories=categories)
+    categories = Category.query.all()
+
+    # Sort categories, placing "Other" at the bottom
+    categories_sorted = sorted([cat for cat in categories if cat.name != "Other"], key=lambda x: x.name)
+    other_category = next((cat for cat in categories if cat.name == "Other"), None)
+    if other_category:
+        categories_sorted.append(other_category)  # Append "Other" at the end
+
+    # Sort courses, placing "Personal Project" at the bottom
+    courses_sorted = sorted([course for course in courses if course.courseName != "Personal Project"], key=lambda x: x.courseName)
+    personal_project_course = next((course for course in courses if course.courseName == "Personal Project"), None)
+    if personal_project_course:
+        courses_sorted.append(personal_project_course)  # Append "Personal Project" at the end
+
+    return render_template('submit.html', courses=courses_sorted, categories=categories_sorted)
 
 
 @app.route('/grabProject', methods=['GET'])
@@ -188,47 +196,83 @@ def getProject():
 
 @app.route('/putProject', methods=['POST'])
 def putProject():
-
     userInfo = ''
 
-    if current_user.is_authenticated: #GETS THE CURRENT USER ID AND HELPS USE THIS TO POPULATE IN DB
+    if current_user.is_authenticated: 
         g.user = current_user.get_id()
         tempUser = User.query.filter_by(id=current_user.get_id()).first()
         userInfo = tempUser.uName
 
-          
-
-    
     data = request.json
 
     projectUser = userInfo
-    projectCategories = data.get('projectCategories')
-    categories = Category.query.filter(Category.id.in_([int(id) for id in projectCategories])).all()
-    projectCourse = int(data.get('projectCourse'))#convert to integer for ID
+    projectCategories = data.get('projectCategories', [])
+    categories = Category.query.filter(Category.id.in_(projectCategories)).all()  # Filter categories by IDs
+    projectCourse = int(data.get('projectCourse'))  # Convert to integer for ID
     projectDescription = data.get('projectDescription')
     projectLink = data.get('projectLink')
     projectContributors = data.get('projectContributors')
     projectApproval = False
-    
+
+    if projectContributors == '':
+        projectContributors = "N/A"
 
     if not Courses.query.get(projectCourse):
         return jsonify(success=False, message="Invalid course ID"), 400
-  
 
     newProject = Project(
         userName=projectUser,
-        categories=categories,
+        categories=categories,  # Assign selected categories
         description=projectDescription,
-        course = projectCourse,
+        course=projectCourse,
         githubLink=projectLink,
-        contributors = projectContributors,
-        isApproved = projectApproval
+        contributors=projectContributors,
+        isApproved=projectApproval
     )
 
     db.session.add(newProject)
     db.session.commit()
 
     return jsonify(success=True, message="Project added successfully")
+
+
+@app.route('/addCourse', methods=['POST'])
+@login_required
+def add_course():
+    # Ensure only admins can add courses
+    if not current_user.isAdmin:
+        return jsonify(success=False, message="Permission denied"), 403
+    
+    data = request.json
+    course_name = data.get('courseName')
+
+    if not course_name:
+        return jsonify(success=False, message="Course name is required"), 400
+
+    new_course = Courses(courseName=course_name)
+    db.session.add(new_course)
+    db.session.commit()
+
+    return jsonify(success=True, message="Course added successfully!")
+
+@app.route('/addCategory', methods=['POST'])
+@login_required
+def add_category():
+    # Ensure only admins can add categories
+    if not current_user.isAdmin:
+        return jsonify(success=False, message="Permission denied"), 403
+
+    data = request.json
+    category_name = data.get('categoryName')
+
+    if not category_name:
+        return jsonify(success=False, message="Category name is required"), 400
+
+    new_category = Category(name=category_name)
+    db.session.add(new_category)
+    db.session.commit()
+
+    return jsonify(success=True, message="Category added successfully!")
 
 
 @app.route('/exploreProjects')
@@ -326,6 +370,23 @@ def testCourses():
     return jsonify(allCourses)
 
 
+@app.route('/testCat', methods=['GET'])
+def testCat():
+    allCats = []
+
+    catValues = Category.query.all()
+
+    for cats in catValues:
+        cat_data = {
+            "id": cats.id,
+            "name": cats.name
+
+        }
+
+        allCats.append(cat_data)
+
+    return jsonify(allCats)
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
@@ -350,6 +411,7 @@ def login():
         else:
             message = 'Incorrect password, try again.'
             message_type = 'error'
+        
 
     return render_template("login.html", user=current_user, message=message, message_type=message_type)
 
@@ -396,9 +458,9 @@ def sign_up():
             # if(email == 'root@gmail.com'):
             #     isAdminValue = True
             # else:
-                isAdminValue = False
+            isAdminValue = False
 
-            new_user = User(email=email, uName=uName, password=generate_password_hash(password1, method='pbkdf2:sha256'), isAdmin= False)
+            new_user = User(email=email, uName=uName, password=generate_password_hash(password1, method='pbkdf2:sha256'), isAdmin= isAdminValue)
             db.session.add(new_user)
             db.session.commit()
             message = 'Account created successfully!'
