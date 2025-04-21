@@ -53,7 +53,7 @@
 
     <div class="addProject">
         <h2>New Project</h2>
-        <p>Note: Do not put your username when putting project contributors, if you worked alone leave this blank! </p>
+        <p>Note: Do not put your username when putting project contributors, if you worked alone leave this blank!</p>
 
         <div class="add-Project-Contributors">
             <label for="new-Project-Contributors">Project Contributors:</label>
@@ -77,7 +77,7 @@
             <select id="new-Project-Course">
                 <option value="" selected disabled>Select a course</option>
                 {% for course in courses %}
-                 <option value="{{ course.id }}">{{ course.courseName }}</option>
+                    <option value="{{ course.id }}">{{ course.courseName }}</option>
                 {% endfor %}
             </select>
         </div>
@@ -92,7 +92,7 @@
             <textarea id="new-Project-Link" placeholder="Enter Github Link..." oninput="resizeTextarea(this)"></textarea>
         </div>
 
-        <button type="button" id="submitButton">Submit Tutorial</button>  
+        <button type="button" id="submitButton">Submit Project</button>  
 
         <br></br>
     </div>  
@@ -121,10 +121,9 @@
         // Event listener for the submit button
         document.getElementById('submitButton').addEventListener('click', async () => {
 
-            const contributors = document.getElementById('new-Project-Contributors').value;
-
-            if(contributors==''){
-                tempContributors = "N/A"
+            let contributors = document.getElementById('new-Project-Contributors').value;
+            if (contributors === '') {
+                contributors = "N/A"; // Set default value if no contributors are entered
             }
             else{
                 tempContributors = contributors
@@ -136,29 +135,28 @@
             let selectedCategories = [];
             const categoryCheckboxes = document.querySelectorAll('.categoryCheckboxes input[type="checkbox"]:checked');
             categoryCheckboxes.forEach(checkbox => {
-                selectedCategories.push(parseInt(checkbox.value));  // use category ID
+                selectedCategories.push(parseInt(checkbox.value));  // Use category ID
             });
             
-            // Join the selected categories into a single string
-            const categories = selectedCategories.length > 0 ? selectedCategories.join(', ') : ''; // Handle no selection
+            // Ensure at least one category is selected
+            if (selectedCategories.length === 0) {
+                alert("Please select at least one category.");
+                return;
+            }
     
             const course = document.getElementById('new-Project-Course').value;
-
-
             const link = document.getElementById('new-Project-Link').value;
     
             // Check if all fields are filled, including categories
-            if (!description || !categories || !link) {
+            if (!description || !course || !link) {
                 alert("Please fill in all fields before submitting.");
                 return; 
             }
-
-          
     
             const requestData = {
-                projectContributors: tempContributors, 
+                projectContributors: contributors, 
                 projectDescription: description,
-                projectCategories: categories,
+                projectCategories: selectedCategories,
                 projectCourse: course,
                 projectLink: link
             };
@@ -173,12 +171,7 @@
             catCheckboxes.forEach(checkbox => {
                 checkbox.checked = false;  // Uncheck each checkbox
             });
-            // const checkboxes = document.querySelectorAll('.courseCheckboxes input[type="checkbox"]');
-            // checkboxes.forEach(checkbox => {
-            //     checkbox.checked = false;  // Uncheck each checkbox
-            // });
-    
-    
+
             resetTextareaSize();
     
             try {        
