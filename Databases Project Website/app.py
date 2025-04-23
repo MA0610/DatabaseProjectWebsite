@@ -70,8 +70,10 @@ def get_data_from_db():
 
 
 def get_NOT_APPROVED_data_from_db():
-    projects = Project.query.filter_by(postStatus="unapproved" or "disapproved" or "archived").all()
+    #projects = Project.query.filter_by(postStatus='unapproved' or 'disapproved' or 'archived').all()
+    projects = Project.query.filter(Project.postStatus.in_(['unapproved', 'disapproved', 'archived'])).all()
     data = []
+
     for project in projects:
         category_names = [cat.name for cat in project.categories]
         project_data = {
@@ -91,7 +93,7 @@ def get_NOT_APPROVED_data_from_db():
 def get_APPROVED_data_from_db():
     # Use SQLAlchemy to query the Project table
 
-    projects = Project.query.filter_by(postStatus = "approved").all()
+    projects = Project.query.filter_by(postStatus='approved').all()
 
 
     data = []
@@ -227,7 +229,7 @@ def putProject():
         course=projectCourse,
         githubLink=projectLink,
         contributors=projectContributors,
-        psotStatus=projectApproval
+        postStatus=projectApproval
     )
 
     db.session.add(newProject)

@@ -196,7 +196,7 @@
                 idsApproved.push(checkboxValues[i].value); 
             }
         }
-
+        console.log("Sending project IDs to approve:", idsApproved);
 
         try {
             const response = await fetch('/un-approveProject', {

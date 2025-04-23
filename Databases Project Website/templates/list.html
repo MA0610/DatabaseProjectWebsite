@@ -26,6 +26,7 @@
             <th>Course</th>
             <th>Description</th>
             <th>GitHub Link</th>
+            <th>Status</th>
         </tr>
     </thead>
     <tbody>
@@ -41,6 +42,7 @@
                 <td>{{ project.course_relation.courseName }}</td>
                 <td>{{ project.description }}</td>
                 <td><a href="{{ project.githubLink }}" target="_blank">GitHub</a></td>
+                <td>{{ project.postStatus }}</td>
             </tr>
         {% endfor %}
     </tbody>

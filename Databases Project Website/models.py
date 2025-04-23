@@ -17,7 +17,7 @@ class Project(db.Model):
     description = db.Column(db.String(10000), nullable=False)
     githubLink = db.Column(db.String(100), nullable=False)
     contributors = db.Column(db.String(300)) #make it so users in this category have to be in Users database NOT DONE
-    postStatus = db.Column(db.String(50), nullable=False) #unapproved, approved, archived, disapproved
+    postStatus = db.Column(db.String(50), nullable=False, default = "unapproved") #unapproved, approved, archived, disapproved
     course_relation = db.relationship('Courses', back_populates='projects')
 
 class User(db.Model, UserMixin):
