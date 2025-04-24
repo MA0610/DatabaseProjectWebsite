@@ -44,6 +44,15 @@
                         Course: {{ project.course }}<br>
                         Description: {{ project.description }}<br>
                         <a href="{{ project.githubLink }}">GitHub Link</a><br><br>
+                        {% set is_bookmarked = project.id in bookmarked_project_ids %}
+                        <button 
+                            class="bookmark-btn" 
+                            onclick="toggleBookmark({{ project.id }})" 
+                            id="btn-{{ project.id }}"
+                        >
+                            {{ '⭐ Remove Bookmark' if is_bookmarked else '☆ Bookmark' }}
+                        </button>
+                        <span class="bookmark-success" id="success-{{ project.id }}"></span>
                     </li>
                 {% endfor %}
             </ul>
@@ -65,6 +74,27 @@
                 selectAll.checked = allChecked;
             });
         });
+        async function toggleBookmark(projectId) {
+        const res = await fetch(`/toggle-bookmark/${projectId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+
+        const result = await res.json();
+        const btn = document.getElementById(`btn-${projectId}`);
+        const msg = document.getElementById(`success-${projectId}`);
+
+        if (result.success) {
+            if (result.action === 'added') {
+                btn.textContent = '⭐ Remove Bookmark';
+                msg.textContent = 'Bookmarked!';
+            } else {
+                btn.textContent = '☆ Bookmark';
+                msg.textContent = 'Removed!';
+            }
+            setTimeout(() => { msg.textContent = ''; }, 2000);
+        }
+    }
     </script>
 </body>
 {% endblock %}
