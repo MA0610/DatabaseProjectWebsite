@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}My Profile{% endblock %}
+
+{% block content %}
+<h1>Update Profile</h1>
+
+{% if message %}
+    <p style="color: {{ 'green' if message_type == 'success' else 'red' }}">{{ message }}</p>
+{% endif %}
+
+<form method="POST">
+    <!-- {% if current_user.profile_picture %}
+        <img src="{{ url_for('static', filename='uploads/' + current_user.profile_picture) }}">
+    {% else %}
+        <img src="{{ url_for('static', filename='default-avatar.png') }}"> -->
+    <label for="username">Username:</label><br>
+    <input type="text" name="username" value="{{ user.uName }}"><br><br>
+
+    <label for="email">Email:</label><br>
+    <input type="email" name="email" value="{{ user.email }}"><br><br>
+
+    <hr>
+
+    <h3>Change Password</h3>
+    <label for="current_password">Current Password:</label><br>
+    <input type="password" name="current_password"><br><br>
+
+    <label for="new_password">New Password:</label><br>
+    <input type="password" name="new_password"><br><br>
+
+    <label for="confirm_password">Confirm New Password:</label><br>
+    <input type="password" name="confirm_password"><br><br>
+
+    <!-- <hr>
+
+    <label for="profile_picture">Profile Picture:</label><br>
+    <input type="file" name="profile_picture"><br><br> -->
+    <button type="submit">Update Profile</button>
+</form>
+{% endblock %}
