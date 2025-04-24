@@ -13,6 +13,7 @@
         <img src="{{ url_for('static', filename='uploads/' + current_user.profile_picture) }}">
     {% else %}
         <img src="{{ url_for('static', filename='default-avatar.png') }}"> -->
+    {% endif %}
     <label for="username">Username:</label><br>
     <input type="text" name="username" value="{{ user.uName }}"><br><br>
 
