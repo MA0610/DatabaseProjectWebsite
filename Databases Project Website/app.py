@@ -1,10 +1,15 @@
-from flask import Flask, request, jsonify, render_template, flash, redirect, url_for, g
+from flask import Flask, request, jsonify, render_template, flash, redirect, url_for, g#, flash
 from flask_login import login_user, login_required, logout_user, current_user, LoginManager
 from werkzeug.security import generate_password_hash, check_password_hash
-from models import db, Project, User, Courses, Category
+from models import db, Project, User, Courses, Category, Bookmark
 from sqlalchemy import or_
 
+# import os
+# from werkzeug.utils import secure_filename
 
+# # Define the path for uploading
+# UPLOAD_FOLDER = os.path.join('static', 'uploads')
+# ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 app = Flask(__name__)
 
 # Initialize LoginManager
@@ -13,7 +18,17 @@ login_manager.init_app(app)  # Attach it to the app
 
 # Set the login_view to redirect users to the login page if they're not authenticated
 login_manager.login_view = 'login'
+# app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+# app.config['MAX_CONTENT_LENGTH'] = 2 * 1024 * 1024  # 2MB limit
+# def allowed_file(filename):
+#     return '.' in filename and \
+#            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+# # File upload settings
+# UPLOAD_FOLDER = 'static/uploads/'
+# ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
+# app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+# app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # max file size: 16MB
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///projects.db'
 app.config['SECRET_KEY'] = 'hjshjhdjah kjshkjdhjs'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -293,9 +308,15 @@ def exploreX():
     else:
         filtered_projects = Project.query.all()
 
-    return render_template('list.html',
+    bookmarked_ids = []
+    if current_user.is_authenticated:
+        bookmarked_ids = [b.project_id for b in current_user.bookmarks]
+
+    return render_template('explore.html',
                            data=filtered_projects,
-                           selected_categories=selected_categories)
+                           selected_categories=selected_categories,
+                           categories=Category.query.all(),
+                           bookmarked_project_ids=bookmarked_ids)
 
 @app.route('/projectList')
 def allProjects():
@@ -307,8 +328,132 @@ def projects():
     print (data)
     return render_template('list.html', data=data) 
 
+# @app.route('/upload_profile_pic', methods=['POST'])
+# @login_required
+# def upload_profile_pic():
+#     if 'profile_pic' not in request.files:
+#         flash('No file part')
+#         return redirect(request.url)
 
+#     file = request.files['profile_pic']
+#     if file.filename == '':
+#         flash('No selected file')
+#         return redirect(request.url)
 
+#     if file and allowed_file(file.filename):
+#         filename = secure_filename(file.filename)
+#         file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+#         file.save(file_path)
+
+#         # Save file path to user's database entry
+#         user = User.query.get(current_user.id)
+#         user.profile_picture = filename
+#         db.session.commit()
+
+#         flash('Profile picture updated!')
+#         return redirect(url_for('profile'))
+
+#     flash('Invalid file type')
+#     return redirect(request.url)
+
+@app.route('/my-bookmarks')
+@login_required
+def my_bookmarks():
+    bookmarks = Bookmark.query.filter_by(user_id=current_user.id).all()
+    projects = [b.project for b in bookmarks]
+    return render_template('bookmarks.html', projects=projects)
+
+@app.route('/bookmark/<int:project_id>', methods=['POST'])
+@login_required
+def bookmark_project(project_id):
+    existing = Bookmark.query.filter_by(user_id=current_user.id, project_id=project_id).first()
+    if existing:
+        return jsonify(success=False, message="Already bookmarked.")
+    new_bookmark = Bookmark(user_id=current_user.id, project_id=project_id)
+    db.session.add(new_bookmark)
+    db.session.commit()
+    return jsonify(success=True, message="Bookmarked successfully!")
+    
+@app.route('/unbookmark/<int:project_id>', methods=['POST'])
+@login_required
+def unbookmark_project(project_id):
+    bookmark = Bookmark.query.filter_by(user_id=current_user.id, project_id=project_id).first()
+    if bookmark:
+        db.session.delete(bookmark)
+        db.session.commit()
+        return jsonify(success=True, message="Removed bookmark.")
+    return jsonify(success=False, message="Bookmark not found.")
+    
+@app.route('/toggle-bookmark/<int:project_id>', methods=['POST'])
+@login_required
+def toggle_bookmark(project_id):
+    bookmark = Bookmark.query.filter_by(user_id=current_user.id, project_id=project_id).first()
+    if bookmark:
+        db.session.delete(bookmark)
+        db.session.commit()
+        return jsonify(success=True, action='removed')
+    else:
+        new_bookmark = Bookmark(user_id=current_user.id, project_id=project_id)
+        db.session.add(new_bookmark)
+        db.session.commit()
+        return jsonify(success=True, action='added')
+
+@app.route('/profile', methods=['GET', 'POST'])
+@login_required
+def profile():
+    message = None
+    message_type = None
+    
+    if request.method == 'POST':
+        new_username = request.form.get('username')
+        new_email = request.form.get('email')
+        current_password = request.form.get('current_password')
+        new_password = request.form.get('new_password')
+        confirm_password = request.form.get('confirm_password')
+
+        user = User.query.get(current_user.id)
+
+        if new_username:
+            user.uName = new_username
+
+        if new_email:
+            if User.query.filter_by(email=new_email).first() and new_email != current_user.email:
+                message = 'Email already in use.'
+                message_type = 'error'
+            else:
+                user.email = new_email
+
+        # Handle password change
+        if current_password and new_password and confirm_password:
+            if not check_password_hash(user.password, current_password):
+                message = 'Current password is incorrect.'
+                message_type = 'error'
+            elif new_password != confirm_password:
+                message = 'New passwords do not match.'
+                message_type = 'error'
+            elif len(new_password) < 7:
+                message = 'Password must be at least 7 characters.'
+                message_type = 'error'
+            else:
+                user.password = generate_password_hash(new_password)
+                message = 'Password updated successfully.'
+                message_type = 'success'
+
+        #         # Handle profile picture upload
+        # if 'profile_picture' in request.files:
+        #     file = request.files['profile_picture']
+        #     if file and allowed_file(file.filename):
+        #         filename = secure_filename(file.filename)
+        #         filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        #         file.save(filepath)
+        #         user.profile_picture = filepath  # Save file path in database
+
+        if not message_type == 'error':
+            db.session.commit()
+            message = 'Profile updated successfully.'
+            message_type = 'success'
+        
+    return render_template('profile.html', user=current_user, message=message, message_type=message_type)
 
 @app.route('/test', methods=['GET'])
 def test():
