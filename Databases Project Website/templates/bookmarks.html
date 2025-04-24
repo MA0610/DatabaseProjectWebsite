@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}My Bookmarked Projects{% endblock %}
+{% block content %}
+<h1>My Bookmarked Projects</h1>
+
+{% if projects %}
+    <ul>
+    {% for project in projects %}
+        <li>
+            <strong>{{ project.userName }}</strong><br>
+                Categories:
+                {% for category in project.categories %}
+                {{ category.name }}{% if not loop.last %}, {% endif %}
+                {% endfor %}<br>
+                Course: {{ project.course }}<br>
+                Description: {{ project.description }}<br>
+                <a href="{{ project.githubLink }}">GitHub Link</a><br><br>
+            <button class="bookmark-btn" onclick="toggleBookmark({{ project.id }})" id="btn-{{ project.id }}">⭐ Remove Bookmark</button>
+            <span class="bookmark-success" id="success-{{ project.id }}"></span>
+        </li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>You haven't bookmarked any projects yet.</p>
+{% endif %}
+
+<script>
+    async function toggleBookmark(projectId) {
+        const res = await fetch(`/toggle-bookmark/${projectId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+
+        const result = await res.json();
+        const btn = document.getElementById(`btn-${projectId}`);
+        const msg = document.getElementById(`success-${projectId}`);
+
+        if (result.success) {
+            if (result.action === 'added') {
+                btn.textContent = '⭐ Remove Bookmark';
+                msg.textContent = 'Bookmarked!';
+            } else {
+                btn.textContent = '☆ Bookmark';
+                msg.textContent = 'Removed!';
+            }
+
+            setTimeout(() => msg.textContent = '', 2000);
+        }
+    }
+</script>
+{% endblock %}
