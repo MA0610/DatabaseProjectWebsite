@@ -25,6 +25,7 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(150), unique=True)
     uName = db.Column(db.String(150), nullable=False)
     password = db.Column(db.String(150), nullable=False)
+    # profile_picture = db.Column(db.String(200), nullable=True) 
     isAdmin = db.Column(db.Boolean, nullable=False) #Would need to manually add users as admin either preBoot or through hidden page through root user
                                        #This would be done at project boot
     projects = db.relationship('Project')
@@ -37,3 +38,10 @@ class Courses(db.Model):
 class Category(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     name = db.Column(db.String(50), nullable = False, unique=True)
+
+class Bookmark(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id'), nullable=False)
+    project = db.relationship('Project', backref='bookmarked_by')
+    user = db.relationship('User', backref='bookmarks')
