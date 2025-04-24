@@ -35,6 +35,10 @@
           <a class="nav-item nav-link" id="submission" href="/submitProject">Submit Project</a>
           <a class="nav-item nav-link" id="explore" href="/exploreProjects">Explore Projects</a>
           <a class="nav-item nav-link" id="list" href="/projectList">List Projects</a>
+          <a class="nav-item nav-link" id="bookmark" href="/my-bookmarks">My Bookmarks</a>
+          {% if current_user.is_authenticated %}
+            <a href="{{ url_for('profile') }}">My Profile</a>
+          {% endif %}
         </div>
     
 
