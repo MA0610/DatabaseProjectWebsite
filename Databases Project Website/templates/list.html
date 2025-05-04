@@ -20,8 +20,10 @@
 <table border="1">
     <thead>
         <tr>
-            <th>ID</th>
+<!--             <th>ID</th> -->
+            
             <th>User Name</th>
+            <th>Contributors</th>
             <th>Categories</th>
             <th>Course</th>
             <th>Description</th>
@@ -32,8 +34,10 @@
     <tbody>
         {% for project in data %}
             <tr>
-                <td>{{ project.id }}</td>
+<!--                 <td>{{ project.id }}</td> -->
                 <td>{{ project.userName }}</td>
+                <td>{{ project.contributors }}</td>
+
                 <td>
                     {% for category in project.categories %}
                     {{ category.name }}{% if not loop.last %}, {% endif %}
