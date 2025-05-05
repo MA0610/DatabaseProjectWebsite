@@ -61,35 +61,71 @@ with app.app_context():
         db.session.commit()
 
     if not Project.query.first():   
-            catvar = Category.query.filter_by(name="Web Development").all()
-    
-            course_367 = Courses.query.filter_by(courseName="COMP 367").first()
-            course_personal_project = Courses.query.filter_by(courseName="Personal Project").first()
-    
-            
-    
-            projects_info = [
-                Project(userName="Matthew Arboleda",
-                        categories=catvar,  
-                        course=course_367.id,  
-                        description="This project is a scheduling website meant to help professors at Occidental communicate when each class should be to avoid having important classes at the same time before sending the schedule to the registrar's office. This website uses Python, SQLAlchemy, and Flask.",
-                        githubLink="https://github.com/MA0610/SchedulingWebsite",
-                        contributors="Diego Santiago, Jose Bustamente Ortiz, Marvin Romero",
-                        postStatus="unapproved"),
-    
-                Project(userName="Matthew Arboleda",
-                        categories=catvar,  
-                        course=course_personal_project.id,  
-                        description="This is an e-plant shopping website using REACT, this was made for IBM's developing front-end apps using REACT course.",
-                        githubLink="https://github.com/MA0610/e-plantShopping",
-                        contributors="",
-                        postStatus="unapproved")
-            ]
-    
-            for project in projects_info:
-                db.session.add(project)
-    
-            db.session.commit()  
+
+
+        catWD = Category.query.filter_by(name="Web Development").all()
+        catML = Category.query.filter_by(name="Machine Learning").all()
+        catAI = Category.query.filter_by(name="AI").all()
+
+
+        # Fetch courses by their names (ensure they exist)
+        course_367 = Courses.query.filter_by(courseName="COMP 367").first()
+        course_personal_project = Courses.query.filter_by(courseName="Personal Project").first()
+
+        if not course_367 or not course_personal_project:
+            raise ValueError("One or more courses are missing in the database.")
+
+        projects_info = [
+            Project(userName="Matthew Arboleda",
+                    categories=catWD,  
+                    course=course_367.id,  
+                    description="This project is a scheduling website meant to help professors at Occidental communicate when each class should be to avoid having important classes at the same time before sending the schedule to the registrar's office. This website uses Python, SQLAlchemy, and Flask.",
+                    githubLink="https://github.com/MA0610/SchedulingWebsite",
+                    contributors="Diego Santiago, Jose Bustamente Ortiz, Marvin Romero",
+                    postStatus="unapproved"),
+
+            Project(userName="Matthew Arboleda",
+                    categories=catWD,  
+                    course=course_personal_project.id, 
+                    description="This is an e-plant shopping website using REACT, this was made for IBM's developing front-end apps using REACT course.",
+                    githubLink="https://github.com/MA0610/e-plantShopping",
+                    contributors="",
+                    postStatus="unapproved"),
+
+            Project(userName="John Doe",
+                    categories=catWD,  
+                    course=course_personal_project.id,
+                    description="A personal project to create a blog website using Flask and React.",
+                    githubLink="https://github.com/johndoe/blog_website",
+                    contributors="John Doe",
+                    postStatus="unapproved"),
+
+
+            Project(userName="Alice Smith",
+                    categories=catML,  
+                    course=course_367.id,
+                    description="This is a project about Machine Learning for predictive analytics in healthcare.",
+                    githubLink="https://github.com/alice/ml_healthcare_project",
+                    contributors="Alice Smith, Bob Jones",
+                    postStatus="unapproved"),
+
+
+
+            Project(userName="Sarah Lee",
+                    categories=catAI,  
+                    course=course_367.id,
+                    description="AI-based web application to optimize supply chain logistics.",
+                    githubLink="https://github.com/sarahlee/ai_supply_chain",
+                    contributors="Sarah Lee, Mark Zhang",
+                    postStatus="unapproved"),
+
+        ]
+
+        # Bulk insert the projects into the database
+      
+        for values in projects_info:
+                db.session.add(values)
+        db.session.commit()  
 
         
 
