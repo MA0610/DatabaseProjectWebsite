@@ -45,7 +45,7 @@ with app.app_context():
     
     
     if not Courses.query.first():   #populates the Courses table with values at app creation
-        course_names = ["COMP 131", "COMP 373", "COMP 390", "COMP 490", "Personal Project"]
+        course_names = ["COMP 131","COMP 367", "COMP 373", "COMP 390", "COMP 490", "Personal Project"]
         for name in course_names:
             db.session.add(Courses(courseName=name))
         db.session.commit()
