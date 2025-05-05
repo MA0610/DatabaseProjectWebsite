@@ -60,7 +60,7 @@ with app.app_context():
             db.session.add(Category(name=category_name))
         db.session.commit()
 
- if not Project.query.first():   
+     if not Project.query.first():   
 
 
         catWD = Category.query.filter_by(name="Web Development").all()
