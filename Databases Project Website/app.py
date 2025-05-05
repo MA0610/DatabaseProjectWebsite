@@ -42,15 +42,7 @@ with app.app_context():
     db.create_all()  # Creates the database tables
 
 
-     if not Project.query.first():   
-        projects_info = [Project(userName="Matthew Arboleda",catgories="Web Development",course="COMP 367",
-                        description="This project is a scheduling website meant to help professors at Occidental communicate when each class should be to avoid having important classes at the same time before sending the schedule to the registrar's office. This website uses Python, SQLAlchemy, and Flask", 
-                        githubLink="https://github.com/MA0610/SchedulingWebsite",contributors="Diego Santiago, Jose Bustamente Ortiz, Marvin Romero", postStatus="unapproved"),Project(userName="Matthew Arboleda",catgories="Web Development",course="Personal Project",
-                        description="This is an e-plant shopping website using REACT, this was made for IBM's developing front-end apps using REACT course.", 
-                        githubLink="https://github.com/MA0610/e-plantShopping",contributors="", postStatus="unapproved")]
-        for name in projects_info:
-            db.session.add(projects_info)
-        db.session.commit()
+    
     
     if not Courses.query.first():   #populates the Courses table with values at app creation
         course_names = ["COMP 131", "COMP 373", "COMP 390", "COMP 490", "Personal Project"]
@@ -66,7 +58,39 @@ with app.app_context():
         default_categories = ["Machine Learning", "Artificial Intelligence", "Web Development", "Game Development", "Natural Language Processing", "Data Science", "Other"]
         for category_name in default_categories:
             db.session.add(Category(name=category_name))
-        db.session.commit() #is this redundant
+        db.session.commit()
+
+    if not Project.query.first():   
+            catvar = Category.query.filter_by(name="Web Development").all()
+    
+            course_367 = Courses.query.filter_by(courseName="COMP 367").first()
+            course_personal_project = Courses.query.filter_by(courseName="Personal Project").first()
+    
+            
+    
+            projects_info = [
+                Project(userName="Matthew Arboleda",
+                        categories=catvar,  
+                        course=course_367.id,  
+                        description="This project is a scheduling website meant to help professors at Occidental communicate when each class should be to avoid having important classes at the same time before sending the schedule to the registrar's office. This website uses Python, SQLAlchemy, and Flask.",
+                        githubLink="https://github.com/MA0610/SchedulingWebsite",
+                        contributors="Diego Santiago, Jose Bustamente Ortiz, Marvin Romero",
+                        postStatus="unapproved"),
+    
+                Project(userName="Matthew Arboleda",
+                        categories=catvar,  
+                        course=course_personal_project.id,  
+                        description="This is an e-plant shopping website using REACT, this was made for IBM's developing front-end apps using REACT course.",
+                        githubLink="https://github.com/MA0610/e-plantShopping",
+                        contributors="",
+                        postStatus="unapproved")
+            ]
+    
+            for project in projects_info:
+                db.session.add(project)
+    
+            db.session.commit()  
+
         
 
 # User loader function for Flask-Login
