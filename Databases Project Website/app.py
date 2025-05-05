@@ -89,7 +89,7 @@ with app.app_context():
                     course=course_personal_project.id, 
                     description="This is an e-plant shopping website using REACT, this was made for IBM's developing front-end apps using REACT course.",
                     githubLink="https://github.com/MA0610/e-plantShopping",
-                    contributors="",
+                    contributors="N/A",
                     postStatus="unapproved"),
 
             Project(userName="John Doe",
