@@ -38,4 +38,22 @@
     <input type="file" name="profile_picture"><br><br> -->
     <button type="submit">Update Profile</button>
 </form>
+<hr>
+{% for project in user.projects %}
+<div class="project-card">
+    <h3>My Projects</h3> 
+    <h4>Project #{{ project.id }}</h4>
+    <p><strong>Description:</strong> {{ project.description}}</p>
+    <p><strong>Course:</strong> {{ project.course_relation.courseName }}</p>
+    <p><strong>GitHub:</strong> <a href="{{ project.githubLink }}">{{ project.githubLink }}</a></p>
+    <p><strong>Status:</strong> {{ project.postStatus }}</p>
+    <p><strong>Categories:</strong>
+    {% for category in project.categories %}
+    {{ category.name }}{% if not loop.last %}, {% endif %}
+    {% endfor %}
+    </p>
+</div>
+{% else %}
+<p>No projects found.</p>
+{% endfor %}
 {% endblock %}
