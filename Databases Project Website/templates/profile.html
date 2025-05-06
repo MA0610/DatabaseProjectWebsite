@@ -39,9 +39,9 @@
     <button type="submit">Update Profile</button>
 </form>
 <hr>
+<h3>My Projects</h3> 
 {% for project in user.projects %}
 <div class="project-card">
-    <h3>My Projects</h3> 
     <h4>Project #{{ project.id }}</h4>
     <p><strong>Description:</strong> {{ project.description}}</p>
     <p><strong>Course:</strong> {{ project.course_relation.courseName }}</p>
