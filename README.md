@@ -1,0 +1,1 @@
+This website uses Python and Flask in order to take and display computer science projects. This was made in an effort to let computer science students at Occidental College have the chance to display their coding projects. 
